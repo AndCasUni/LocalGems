@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "445108147896",
+    "project_id": "local-gems-1ad34",
+    "storage_bucket": "local-gems-1ad34.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445108147896:android:90c7d2dd1de9de1baf864d",
+        "android_client_info": {
+          "package_name": "com.example.localgems"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDbv67IWicZjs0_sfI8TYl0QTaWLzQiuyI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
