@@ -1,4 +1,4 @@
-package com.example.localgems.ui.gallery;
+/*package com.example.localgems.ui.gallery;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,4 +34,4 @@ public class GalleryFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-}
+} */
