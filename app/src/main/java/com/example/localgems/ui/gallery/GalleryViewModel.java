@@ -1,4 +1,4 @@
-package com.example.localgems.ui.gallery;
+/*package com.example.localgems.ui.gallery;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -16,4 +16,4 @@ public class GalleryViewModel extends ViewModel {
     public LiveData<String> getText() {
         return mText;
     }
-}
+}*/

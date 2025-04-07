@@ -1,4 +1,4 @@
-package com.example.localgems.ui.slideshow;
+/*package com.example.localgems.ui.slideshow;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
@@ -16,4 +16,4 @@ public class SlideshowViewModel extends ViewModel {
     public LiveData<String> getText() {
         return mText;
     }
-}
+}*/

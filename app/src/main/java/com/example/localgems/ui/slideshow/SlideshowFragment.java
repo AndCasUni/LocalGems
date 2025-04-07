@@ -1,4 +1,4 @@
-package com.example.localgems.ui.slideshow;
+/*package com.example.localgems.ui.slideshow;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -34,4 +34,4 @@ public class SlideshowFragment extends Fragment {
         super.onDestroyView();
         binding = null;
     }
-}
+}*/
