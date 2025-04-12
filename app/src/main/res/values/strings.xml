@@ -15,4 +15,5 @@
     <string name="menu_cart">Cart</string>
     <string name="menu_account">Account</string>
     <string name="menu_contacts">Contacts</string>
+    <string name="menu_search">Search</string>
 </resources>
