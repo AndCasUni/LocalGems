@@ -1,4 +1,4 @@
-package com.example.localgems.ui.home;
+package com.example.localgems.ui.search;
 
 import android.os.Bundle;
 import android.view.LayoutInflater;
@@ -15,12 +15,12 @@ import com.example.localgems.model.Product;
 
 import java.util.List;
 
-public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> {
+public class SearchProductsAdapter extends RecyclerView.Adapter<SearchProductsAdapter.ViewHolder> {
 
     private final List<Product> products;
 
     // Costruttore
-    public ProductsAdapter(List<Product> products) {
+    public SearchProductsAdapter(List<Product> products) {
         this.products = products;
     }
 
