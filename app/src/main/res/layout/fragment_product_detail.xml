@@ -111,7 +111,7 @@
 
                 <TextView
                     android:id="@+id/product_location"
-                    android:layout_width="86dp"
+                    android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:text="Si trova a 20km, a Dos Hermanas (SE)" />
 
@@ -122,7 +122,7 @@
                     android:layout_width="100dp"
                     android:layout_height="wrap_content"
                     android:text="@string/show_on_map"
-                    android:textSize="10dp" />
+                    android:textSize="11sp" />
             </LinearLayout>
 
             <TextView
