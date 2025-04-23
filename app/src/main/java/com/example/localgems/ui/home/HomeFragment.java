@@ -1,6 +1,7 @@
 package com.example.localgems.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -18,12 +19,18 @@ import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
 import com.example.localgems.model.*;
+import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
 
+    private List<Product> products ;
+    private ProductsAdapter productsAdapter;
     private FragmentHomeBinding binding;
 
     @Override
@@ -36,6 +43,9 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
+        products = new ArrayList<>();
+        productsAdapter = new ProductsAdapter(products);
+
         // Initialize UI elements
         MaterialToolbar toolbar = binding.toolbar;
         RecyclerView recyclerView = binding.productsRecyclerView;
@@ -47,8 +57,9 @@ public class HomeFragment extends Fragment {
                 Toast.makeText(getContext(), "Navigation click!", Toast.LENGTH_SHORT).show());
 
         // Set up RecyclerView
+        products = getProducts();
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setAdapter(new ProductsAdapter(getProducts())); // Assicurati di avere un Adapter configurato
+        recyclerView.setAdapter(productsAdapter); // Assicurati di avere un Adapter configurato
 
         // Set up FloatingActionButton
         fab.setOnClickListener(v ->
@@ -65,10 +76,34 @@ public class HomeFragment extends Fragment {
 
     // Metodo fittizio per ottenere i prodotti
     private List<Product> getProducts() {
-        // Simula una lista di prodotti (aggiungi la classe Product nel tuo progetto)
-        List<Product> products = new ArrayList<>();
-        products.add(new Product("Prodotto 1", 9.99));
-        products.add(new Product("Prodotto 2", 14.99));
+
+
+       // products.add(new Product("Prodotto 1", 9.99));
+        //products.add(new Product("Prodotto 2", 14.99));
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("products")
+                .orderBy("rating", Query.Direction.DESCENDING)
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<Product> ratedProducts = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        Product product = doc.toObject(Product.class);
+                        product.setId(doc.getId()); // Memorizza l'id del documento
+                        ratedProducts.add(product);
+                    }
+
+                    // Ad esempio: aggiorna l'adapter con la nuova lista
+                    products.clear();
+                    products.addAll(ratedProducts);
+                    productsAdapter.notifyDataSetChanged();
+
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("FIREBASE", "Errore nel recupero dei prodotti per valutazione", e);
+                });
+
         return products;
     }
 }
