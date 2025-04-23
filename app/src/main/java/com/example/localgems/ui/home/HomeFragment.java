@@ -94,7 +94,7 @@ public class HomeFragment extends Fragment {
                     Bundle bundle = new Bundle();
                     bundle.putString("search_query", query);
                     // TODO: Vedere come creare una nuovo fragment "Search" e aprirlo al posto di fragment home.
-                    Navigation.findNavController(this).navigate(R.id.nav_search, bundle);
+                    //Navigation.findNavController(this).navigate(R.id.nav_search, bundle);
                     return false;
                 }
 

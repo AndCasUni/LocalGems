@@ -79,67 +79,96 @@
 
         <Button
             android:id="@+id/quantity_minus_button"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="-" />
+            style="@style/Widget.Material3.Button"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="-"
+            android:textAlignment="center"
+            android:textIsSelectable="false"
+            android:textSize="20dp" />
 
         <TextView
             android:id="@+id/quantity_text"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginHorizontal="16dp"
-            android:text="1"
-            android:textSize="24dp" />
+            android:layout_width="30dp"
+            android:layout_height="30dp"
+            android:layout_marginHorizontal="4dp"
+            android:gravity="center"
+            android:text="99"
+            android:textAlignment="center"
+            android:textSize="20dp" />
 
         <Button
             android:id="@+id/quantity_plus_button"
-            style="@style/Widget.AppCompat.Button.Small"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="+" />
+            style="@style/Widget.Material3.Button"
+            android:layout_width="40dp"
+            android:layout_height="30dp"
+            android:gravity="center"
+            android:includeFontPadding="false"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            android:minWidth="0dp"
+            android:minHeight="0dp"
+            android:padding="0dp"
+            android:text="+"
+            android:textAlignment="center"
+            android:textIsSelectable="false"
+            android:textSize="20dp" />
 
-        <LinearLayout
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:layout_height="wrap_content">
 
             <LinearLayout
+                android:id="@+id/product_location"
                 android:layout_width="match_parent"
-                android:layout_height="30dp"
+                android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
+                <!-- TODO: ADD MAP SYMBOL -->
                 <TextView
-                    android:id="@+id/product_location"
-                    android:layout_width="100dp"
+                    android:id="@+id/product_location_text"
+                    android:layout_width="212dp"
                     android:layout_height="wrap_content"
+                    android:gravity="start|top"
                     android:text="Si trova a 20km, a Dos Hermanas (SE)" />
 
-                <!-- TODO: ADD MAP SYMBOL -->
                 <Button
-                    android:id="@+id/product_show_on_map"
-                    style="@style/Widget.AppCompat.Button.Small"
-                    android:layout_width="100dp"
-                    android:layout_height="wrap_content"
-                    android:text="@string/show_on_map"
-                    android:textSize="11sp" />
+                    android:id="@+id/product_location_map_button"
+                    style="@style/Widget.Material3.Button.IconButton"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="end"
+                    android:layout_weight="0.8"
+                    android:textSize="11sp"
+                    app:icon="@android:drawable/ic_dialog_map"
+                    app:iconGravity="end" />
             </LinearLayout>
 
             <TextView
                 android:id="@+id/product_delivery_available"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="@string/delivery_available" />
-        </LinearLayout>
+                android:text="@string/delivery_available"
+                android:layout_below="@+id/product_location" />
+        </RelativeLayout>
 
     </LinearLayout>
 
     <Button
         android:id="@+id/add_to_cart_button"
+        style="@style/Widget.Material3.Button"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_margin="16dp"
         android:text="@string/add_to_cart"
+        android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/mapView" />
