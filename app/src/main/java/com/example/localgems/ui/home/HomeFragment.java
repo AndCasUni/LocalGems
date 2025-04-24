@@ -154,8 +154,9 @@ public class HomeFragment extends Fragment {
         recyclerView.setAdapter(new SearchProductsAdapter(getProducts())); // Assicurati di avere un Adapter configurato
 
         // Set up FloatingActionButton
-        fab.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Filtri applicati!", Toast.LENGTH_SHORT).show());
+        fab.setOnClickListener((v) -> {
+            Navigation.findNavController(v).navigate(R.id.nav_login);
+        });
 
         return root;
     }

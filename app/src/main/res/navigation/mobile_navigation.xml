@@ -12,18 +12,6 @@
         tools:layout="@layout/fragment_home" />
 
     <fragment
-        android:id="@+id/nav_products"
-        android:name="com.example.localgems.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
-        tools:layout="@layout/fragment_products" />
-
-    <fragment
-        android:id="@+id/nav_vendors"
-        android:name="com.example.localgems.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
-        tools:layout="@layout/fragment_vendors" />
-
-    <fragment
         android:id="@+id/nav_product_details"
         android:name="com.example.localgems.ui.product.ProductDetailFragment"
         android:label="Product Detail"
@@ -34,6 +22,12 @@
         android:name="com.example.localgems.ui.search.SearchFragment"
         android:label="@string/menu_search"
         tools:layout="@layout/fragment_search" />
+
+    <fragment
+        android:id="@+id/nav_login"
+        android:name="com.example.localgems.ui.login.LoginFragment"
+        android:label="Login Page"
+        tools:layout="@layout/fragment_log_in" />
 
     <!--
     <fragment
