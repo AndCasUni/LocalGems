@@ -29,10 +29,6 @@ public class ProductDetailFragment extends Fragment {
     private Button quantityPlusButton;
     private Button quantityMinusButton;
 
-    private Button showMapButton;
-
-    private MapView mapView;
-
     private int quantity = 1;
 
     @Nullable
@@ -49,8 +45,6 @@ public class ProductDetailFragment extends Fragment {
         addToCartButton = root.findViewById(R.id.add_to_cart_button);
         quantityPlusButton = root.findViewById(R.id.quantity_plus_button);
         quantityMinusButton = root.findViewById(R.id.quantity_minus_button);
-        showMapButton = root.findViewById(R.id.product_location_map_button);
-        mapView = root.findViewById(R.id.mapView);
 
         // Logica della quantità
         quantityMinusButton.setOnClickListener(v -> {
@@ -63,18 +57,6 @@ public class ProductDetailFragment extends Fragment {
         quantityPlusButton.setOnClickListener(v -> {
             quantity++;
             quantityText.setText(String.valueOf(quantity));
-        });
-
-        // Inizializza il MapView
-        mapView.onCreate(savedInstanceState);
-        mapView.getMapAsync(googleMap -> {
-            googleMap.getUiSettings().setZoomControlsEnabled(true);
-            googleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(37.3861, -5.9921), 12)); // Posizione di esempio
-        });
-
-        // Function to show the location of the product in a Map.
-        showMapButton.setOnClickListener(v -> {
-            mapView.setVisibility(View.VISIBLE);
         });
 
         // Pulsante aggiungi al carrello
