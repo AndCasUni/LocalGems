@@ -1,6 +1,7 @@
 package com.example.localgems.ui.product;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -14,6 +15,8 @@ import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.localgems.R;
+import com.example.localgems.model.Product;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ProductDetailFragment extends Fragment {
 
@@ -60,10 +63,33 @@ public class ProductDetailFragment extends Fragment {
         addToCartButton.setOnClickListener(v ->
                 Toast.makeText(getContext(), "Prodotto aggiunto al carrello!", Toast.LENGTH_SHORT).show());
 
-        // Dummy Data: Popola la UI (puoi sostituire con dati reali)
-        productName.setText("Esempio di prodotto");
-        productDescription.setText("Una descrizione dettagliata del prodotto.");
-        productPrice.setText("€ 9.99");
+        String productId = getArguments() != null ? getArguments().getString("productId") : null;
+
+        if (productId != null) {
+            FirebaseFirestore.getInstance()
+                    .collection("products")
+                    .document(productId)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            Product product = documentSnapshot.toObject(Product.class);
+                            if (product != null) {
+                                // Mostra i dati nella UI
+                                TextView name = root.findViewById(R.id.product_name);
+                                TextView description = root.findViewById(R.id.product_description);
+                                TextView price = root.findViewById(R.id.product_price);
+
+                                name.setText(product.getName());
+                                description.setText(product.getDescription());
+                                price.setText("€ " + product.getPrice());
+
+                            }
+                        }
+                    })
+                    .addOnFailureListener(e -> Log.e("DETAILS", "Errore nel recupero del prodotto", e));
+        }
+
+
 
         return root;
     }

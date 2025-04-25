@@ -1,9 +1,11 @@
 package com.example.localgems.ui.home;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -13,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.localgems.R;
 import com.example.localgems.model.Product;
+import com.google.firebase.inappmessaging.model.Button;
 
 import java.util.List;
 
@@ -21,7 +24,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     private final List<Product> products;
 
     // Costruttore
-    public ProductsAdapter(List<Product> products) {
+        public ProductsAdapter(List<Product> products) {
         this.products = products;
     }
 
@@ -34,9 +37,11 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     }
 
     @Override
-    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+    /*public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         // Collegamento dati con la UI
         Product product = products.get(position);
+        Log.d("ADAPTER", "Bind del prodotto: " + product.getName());
+
         holder.nameTextView.setText(product.getName());
         holder.priceTextView.setText(String.format("€ %.2f", product.getPrice()));
 
@@ -47,21 +52,55 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
 
             Navigation.findNavController(v).navigate(R.id.nav_product_details, bundle);
         });
+    }*/
+
+    public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
+        Product product = products.get(position);
+        Log.d("ADAPTER", "Bind del prodotto: " + product.getName());
+
+        holder.nameTextView.setText(product.getName());
+        holder.descriptionTextView.setText(product.getDescription());
+        holder.priceTextView.setText(String.format("€ %.2f", product.getPrice()));
+
+        // Caricamento immagine da URL
+        /*Glide.with(holder.itemView.getContext())
+                .load(product.getImageUrl())
+                .placeholder(R.drawable.placeholder_product)
+                .into(holder.imageView);*/
+
+        /*holder.addToCartButton.setOnClickListener(v -> {
+            Toast.makeText(v.getContext(), "Aggiunto al carrello: " + product.getName(), Toast.LENGTH_SHORT).show();
+            // TODO: aggiungi al carrello
+        });*/
+
+        holder.itemView.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("productId", product.getId());  // Passi solo l'ID del prodotto
+            Navigation.findNavController(v).navigate(R.id.nav_product_details, bundle);
+        });
     }
 
     @Override
-    public int getItemCount() {
+    public int getItemCount()    {
         return products.size();
     }
 
     // ViewHolder: definisce gli elementi visivi di ogni item
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView nameTextView, priceTextView;
+
+        TextView nameTextView, descriptionTextView, priceTextView;
+        ImageView imageView;
+        Button addToCartButton;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.product_name);
+            descriptionTextView = itemView.findViewById(R.id.product_description);
             priceTextView = itemView.findViewById(R.id.product_price);
+            imageView = itemView.findViewById(R.id.product_image);
+            //addToCartButton = itemView.findViewById(R.id.add_to_cart_button);
         }
+
+
     }
 }
