@@ -29,11 +29,15 @@
         android:label="Login Page"
         tools:layout="@layout/fragment_log_in" />
 
-    <!--
     <fragment
         android:id="@+id/nav_cart"
         android:name="com.example.localgems.ui.cart.CartFragment"
         android:label="@string/menu_cart"
         tools:layout="@layout/fragment_cart" />
--->
+
+    <fragment
+        android:id="@+id/nav_account"
+        android:name="com.example.localgems.ui.account.AccountFragment"
+        android:label="Account"
+        tools:layout="@layout/fragment_account" />
 </navigation>

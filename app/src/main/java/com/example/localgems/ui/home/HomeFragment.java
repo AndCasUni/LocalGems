@@ -155,7 +155,7 @@ public class HomeFragment extends Fragment {
 
         // Set up FloatingActionButton
         fab.setOnClickListener((v) -> {
-            Navigation.findNavController(v).navigate(R.id.nav_login);
+            Navigation.findNavController(v).navigate(R.id.nav_cart);
         });
 
         return root;
