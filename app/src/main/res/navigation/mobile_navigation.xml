@@ -24,12 +24,6 @@
         tools:layout="@layout/fragment_search" />
 
     <fragment
-        android:id="@+id/nav_login"
-        android:name="com.example.localgems.ui.login.LoginFragment"
-        android:label="Login Page"
-        tools:layout="@layout/fragment_log_in" />
-
-    <fragment
         android:id="@+id/nav_cart"
         android:name="com.example.localgems.ui.cart.CartFragment"
         android:label="@string/menu_cart"
