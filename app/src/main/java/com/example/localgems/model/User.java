@@ -1,22 +1,27 @@
 package com.example.localgems.model;
 
 public class User {
-    private String email;
-    private String firstName;
-    private String lastName;
-    private String birthDate;
-    private String password;
+    private String id;
+    private String name;
 
-    public User(String email, String firstName, String lastName, String birthDate, String password) {
-        this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.password = password;
-    }
+    private String surname;
 
-    // Getters
-    public String getEmail() {
+    private String tax_code;
+
+    private String birth_date;
+  
+  private String email;
+
+    private String[] purchases;
+
+
+    public User(){}
+
+    public String getId(){ return id;}
+
+    public String[] getPurchases() { return purchases;}
+  
+      public String getEmail() {
         return email;
     }
 
@@ -35,9 +40,7 @@ public class User {
     public String getPassword() {
         return password;
     }
-
-    // Setters
-    public void setEmail(String email) {
+      public void setEmail(String email) {
         this.email = email;
     }
 
@@ -53,7 +56,4 @@ public class User {
         this.birthDate = birthDate;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
-    }
 }
