@@ -16,4 +16,20 @@
     <string name="menu_account">Account</string>
     <string name="menu_contacts">Contacts</string>
     <string name="menu_search">Search</string>
+
+    <!-- item_product -->
+    <string name="add">Add</string>
+
+    <!-- fragment_product_detail -->
+    <string name="add_to_cart">Add to Cart</string>
+    <string name="seller_reviews">Seller reviews</string>
+    <string name="show_on_map">Show on map</string>
+    <string name="delivery_available">Delivery available</string>
+
+    <!-- fragment_login -->
+    <string name="loginMessage">¡Debes iniciar sesión primero para ver tu carrito!</string>
+    <string name="emailEditText">Correo</string>
+    <string name="passwordEditText">Contraseña</string>
+    <string name="loginButton">Entra</string>
+    <string name="registerText">¿No tienes una cuenta? ¡Créala ahora!</string>
 </resources>

@@ -19,14 +19,14 @@
             android:id="@+id/search_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:queryHint="Cerca prodotti..."
-            android:iconifiedByDefault="false"
-            android:background="@drawable/search_view_background"
-            android:layout_margin="8dp"
-            android:padding="4dp"
             android:layout_gravity="center"
-            app:queryBackground="@android:color/transparent"
-            app:iconifiedByDefault="false" />
+            android:layout_margin="8dp"
+            android:background="@drawable/search_view_background"
+            android:iconifiedByDefault="false"
+            android:padding="4dp"
+            android:queryHint="Cerca prodotti..."
+            app:iconifiedByDefault="false"
+            app:queryBackground="@android:color/transparent" />
     </com.google.android.material.appbar.MaterialToolbar>
 
     <!-- Lista di prodotti -->

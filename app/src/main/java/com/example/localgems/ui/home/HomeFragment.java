@@ -5,12 +5,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewTreeObserver;
 import android.widget.ArrayAdapter;
-import android.widget.ImageView;
 import android.widget.ListView;
 import android.widget.PopupWindow;
-import android.widget.SimpleCursorAdapter;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -23,7 +20,7 @@ import androidx.appcompat.widget.SearchView;
 
 import com.example.localgems.R;
 import com.example.localgems.databinding.FragmentHomeBinding;
-import com.example.localgems.ui.search.SearchFragment;
+import com.example.localgems.ui.search.SearchProductsAdapter;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 
@@ -100,6 +97,10 @@ public class HomeFragment extends Fragment {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     popupWindow.dismiss();
+                    Bundle bundle = new Bundle();
+                    bundle.putString("search_query", query);
+                    // TODO: Vedere come creare una nuovo fragment "Search" e aprirlo al posto di fragment home.
+                    //Navigation.findNavController(this).navigate(R.id.nav_search, bundle);
                     return false;
                 }
 
@@ -157,11 +158,13 @@ public class HomeFragment extends Fragment {
         // Set up RecyclerView
         products = getProducts();
         recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setAdapter(productsAdapter); // Assicurati di avere un Adapter configurato
+        recyclerView.setAdapter(new SearchProductsAdapter(getProducts())); // Assicurati di avere un Adapter configurato
+        //recyclerView.setAdapter(productsAdapter); // Assicurati di avere un Adapter configurato
 
         // Set up FloatingActionButton
-        fab.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Filtri applicati!", Toast.LENGTH_SHORT).show());
+        fab.setOnClickListener((v) -> {
+            Navigation.findNavController(v).navigate(R.id.nav_cart);
+        });
 
         return root;
     }
