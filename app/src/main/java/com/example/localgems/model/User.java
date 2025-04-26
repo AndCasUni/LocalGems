@@ -27,7 +27,9 @@ public class User {
     }
 
     public String getId(){ return id;}
-
+    public void setId(String id) {
+        this.id = id;
+    }
     public String[] getPurchases() { return purchases;}
 
       public String getEmail() {
@@ -62,4 +64,5 @@ public class User {
         this.birth_date = birthDate;
     }
 
+    
 }
