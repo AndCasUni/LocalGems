@@ -35,7 +35,7 @@ import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private List<Product> products ;
+    private List<Product> products = new ArrayList<>() ;
     private ProductsAdapter productsAdapter;
     private FragmentHomeBinding binding;
     private PopupWindow popupWindow;
@@ -157,10 +157,9 @@ public class HomeFragment extends Fragment {
 
         // Set up RecyclerView
         products = getProducts();
-        recyclerView.setLayoutManager(new LinearLayoutManager(requireContext()));
-        recyclerView.setAdapter(new SearchProductsAdapter(getProducts())); // Assicurati di avere un Adapter configurato
-        //recyclerView.setAdapter(productsAdapter); // Assicurati di avere un Adapter configurato
-
+        productsAdapter = new ProductsAdapter(products, getContext());
+        recyclerView.setAdapter(productsAdapter);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         // Set up FloatingActionButton
         fab.setOnClickListener((v) -> {
             Navigation.findNavController(v).navigate(R.id.nav_cart);
@@ -196,10 +195,15 @@ public class HomeFragment extends Fragment {
                     }
 
                     // Ad esempio: aggiorna l'adapter con la nuova lista
-                    products.clear();
-                    products.addAll(ratedProducts);
-                    productsAdapter.notifyDataSetChanged();
 
+                    if (products != null)
+                    {
+                        products.clear();
+                    }
+                    products.addAll(ratedProducts);
+                    if( productsAdapter != null) {
+                        productsAdapter.notifyDataSetChanged();
+                    }
                 })
                 .addOnFailureListener(e -> {
                     Log.e("FIREBASE", "Errore nel recupero dei prodotti per valutazione", e);

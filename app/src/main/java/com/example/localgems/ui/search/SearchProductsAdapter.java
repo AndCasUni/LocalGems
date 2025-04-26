@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.localgems.R;
 import com.example.localgems.model.Product;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class SearchProductsAdapter extends RecyclerView.Adapter<SearchProductsAdapter.ViewHolder> {
@@ -20,8 +21,8 @@ public class SearchProductsAdapter extends RecyclerView.Adapter<SearchProductsAd
     private final List<Product> products;
 
     // Costruttore
-    public SearchProductsAdapter(List<Product> products) {
-        this.products = products;
+    public SearchProductsAdapter(List<Product> productList) {
+        this.products = (productList != null) ? productList : new ArrayList<>();
     }
 
     @NonNull

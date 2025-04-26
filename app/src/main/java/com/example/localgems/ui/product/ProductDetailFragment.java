@@ -17,10 +17,16 @@ import androidx.fragment.app.Fragment;
 import com.example.localgems.R;
 
 import com.example.localgems.model.Product;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class ProductDetailFragment extends Fragment {
 
+    private String productId;
     private ImageView productImage;
     private TextView productName;
     private TextView productDescription;
@@ -60,10 +66,46 @@ public class ProductDetailFragment extends Fragment {
             quantityText.setText(String.valueOf(quantity));
         });
 
-        // Pulsante aggiungi al carrello
-        addToCartButton.setOnClickListener(v ->
-                Toast.makeText(getContext(), "Prodotto aggiunto al carrello!", Toast.LENGTH_SHORT).show());
+        addToCartButton.setOnClickListener(v -> {
+            // Prendi l'utente loggato
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+            if (user == null) {
+                Toast.makeText(getContext(), "Devi effettuare il login per aggiungere al carrello.", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
+            // Prepara i dati da salvare
+            String userId = user.getUid();
+            Bundle bundle = getArguments();
+            String ID = null;
+            if (bundle != null) {
+                ID = bundle.getString("productId");
+            }
+            String productId = ID ; // <-- supponendo che tu abbia il prodotto caricato
+            String name = productName.getText().toString();
+            String priceString = productPrice.getText().toString().replace("€", "").trim(); // Togli l'euro se presente
+            double price = Double.parseDouble(priceString);
+
+            int quantity = Integer.parseInt(quantityText.getText().toString());
+
+            // Crea la mappa dei dati da inserire
+            Map<String, Object> cartItem = new HashMap<>();
+            cartItem.put("name", name);
+            cartItem.put("quantity", quantity);
+            cartItem.put("price", price);
+
+            // Salva nel database
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users")
+                    .document(userId)
+                    .collection("cart")
+                    .document(productId)
+                    .set(cartItem)
+                    .addOnSuccessListener(documentReference ->
+                            Toast.makeText(getContext(), "Articolo aggiunto al carrello!", Toast.LENGTH_SHORT).show())
+                    .addOnFailureListener(e ->
+                            Toast.makeText(getContext(), "Errore nell'aggiunta al carrello.", Toast.LENGTH_SHORT).show());
+        });
         String productId = getArguments() != null ? getArguments().getString("productId") : null;
 
         if (productId != null) {

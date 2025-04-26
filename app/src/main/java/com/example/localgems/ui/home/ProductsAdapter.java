@@ -1,5 +1,6 @@
 package com.example.localgems.ui.home;
 
+import android.content.Context;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -16,17 +17,23 @@ import com.example.localgems.R;
 import com.example.localgems.model.Product;
 import com.google.firebase.inappmessaging.model.Button;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHolder> {
 
     private final List<Product> products;
+    private Context context;
 
     // Costruttore
         public ProductsAdapter(List<Product> products) {
         this.products = products;
     }
 
+    public ProductsAdapter(List<Product> productList, Context context) {
+        this.context = context;
+        this.products = (productList != null) ? productList : new ArrayList<>();
+    }
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
@@ -80,14 +87,15 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     }
 
     @Override
-    public int getItemCount()    {
-        return products.size();
+    public int getItemCount() {
+        return (products != null) ? products.size() : 0;
     }
 
     // ViewHolder: definisce gli elementi visivi di ogni item
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView nameTextView, descriptionTextView, priceTextView;
+
         ImageView imageView;
         Button addToCartButton;
 
