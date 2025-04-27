@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.navigation.Navigation;
@@ -16,6 +17,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.localgems.R;
 import com.example.localgems.model.Product;
 import com.google.firebase.inappmessaging.model.Button;
+
+import com.bumptech.glide.Glide;
+
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,23 +46,6 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         return new ViewHolder(view);
     }
 
-    @Override
-    /*public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        // Collegamento dati con la UI
-        Product product = products.get(position);
-        Log.d("ADAPTER", "Bind del prodotto: " + product.getName());
-
-        holder.nameTextView.setText(product.getName());
-        holder.priceTextView.setText(String.format("€ %.2f", product.getPrice()));
-
-        holder.itemView.setOnClickListener(v -> {
-            Bundle bundle = new Bundle();
-            bundle.putString("product_name", product.getName());
-            bundle.putDouble("product_price", product.getPrice());
-
-            Navigation.findNavController(v).navigate(R.id.nav_product_details, bundle);
-        });
-    }*/
 
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Product product = products.get(position);
@@ -69,19 +56,18 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         holder.priceTextView.setText(String.format("€ %.2f", product.getPrice()));
 
         // Caricamento immagine da URL
-        /*Glide.with(holder.itemView.getContext())
-                .load(product.getImageUrl())
+        Glide.with(holder.itemView.getContext())
+                .load(product.getImage_url())
                 .placeholder(R.drawable.placeholder_product)
-                .into(holder.imageView);*/
+                .into(holder.imageView);
+        Log.d("URL", "URL: " + product.getImage_url());
 
-        /*holder.addToCartButton.setOnClickListener(v -> {
-            Toast.makeText(v.getContext(), "Aggiunto al carrello: " + product.getName(), Toast.LENGTH_SHORT).show();
-            // TODO: aggiungi al carrello
-        });*/
 
         holder.itemView.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
+            Log.d("URL", "URL DOPO: " + product.getImage_url());
             bundle.putString("productId", product.getId());  // Passi solo l'ID del prodotto
+            bundle.putString("imageURL", product.getImage_url());
             Navigation.findNavController(v).navigate(R.id.nav_product_details, bundle);
         });
     }

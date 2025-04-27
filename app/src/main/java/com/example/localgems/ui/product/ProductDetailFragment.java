@@ -14,6 +14,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
+import com.bumptech.glide.Glide;
 import com.example.localgems.R;
 
 import com.example.localgems.model.Product;
@@ -38,6 +39,9 @@ public class ProductDetailFragment extends Fragment {
 
     private int quantity = 1;
 
+    String ID = null;
+    String imageURL = null;
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
@@ -53,6 +57,25 @@ public class ProductDetailFragment extends Fragment {
         quantityPlusButton = root.findViewById(R.id.quantity_plus_button);
         quantityMinusButton = root.findViewById(R.id.quantity_minus_button);
 
+
+        FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+        assert user != null;
+        String userId = user.getUid();
+        Bundle bundle = getArguments();
+
+        if (bundle != null) {
+            ID = bundle.getString("productId");
+            imageURL = bundle.getString("imageURL"); // <-- Qui prendi il valore
+        }
+
+        Log.d("URL", "URLLETTO: " + imageURL);
+
+        Glide.with(requireContext())
+                .load(imageURL)
+                .placeholder(R.drawable.placeholder_product) // Un'icona mentre carica
+                .error(R.drawable.placeholder_product)       // Se fallisce
+                .into(productImage);
+
         // Logica della quantità
         quantityMinusButton.setOnClickListener(v -> {
             if (quantity > 1) {
@@ -67,32 +90,23 @@ public class ProductDetailFragment extends Fragment {
         });
 
         addToCartButton.setOnClickListener(v -> {
-            // Prendi l'utente loggato
-            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-            if (user == null) {
-                Toast.makeText(getContext(), "Devi effettuare il login per aggiungere al carrello.", Toast.LENGTH_SHORT).show();
-                return;
-            }
-
-            // Prepara i dati da salvare
-            String userId = user.getUid();
-            Bundle bundle = getArguments();
-            String ID = null;
-            if (bundle != null) {
-                ID = bundle.getString("productId");
-            }
-            String productId = ID ; // <-- supponendo che tu abbia il prodotto caricato
+            String productId = ID; // ID già preso dal bundle
             String name = productName.getText().toString();
-            String priceString = productPrice.getText().toString().replace("€", "").trim(); // Togli l'euro se presente
+            String priceString = productPrice.getText().toString().replace("€", "").trim();
             double price = Double.parseDouble(priceString);
+            String description = productDescription.getText().toString();
+            String imageUrl = imageURL; // usa l'imageURL che hai già letto dal bundle
 
             int quantity = Integer.parseInt(quantityText.getText().toString());
 
             // Crea la mappa dei dati da inserire
             Map<String, Object> cartItem = new HashMap<>();
+            cartItem.put("id", productId);
             cartItem.put("name", name);
             cartItem.put("quantity", quantity);
             cartItem.put("price", price);
+            cartItem.put("description", description);
+            cartItem.put("image_url", imageUrl);
 
             // Salva nel database
             FirebaseFirestore db = FirebaseFirestore.getInstance();
@@ -101,7 +115,7 @@ public class ProductDetailFragment extends Fragment {
                     .collection("cart")
                     .document(productId)
                     .set(cartItem)
-                    .addOnSuccessListener(documentReference ->
+                    .addOnSuccessListener(aVoid ->
                             Toast.makeText(getContext(), "Articolo aggiunto al carrello!", Toast.LENGTH_SHORT).show())
                     .addOnFailureListener(e ->
                             Toast.makeText(getContext(), "Errore nell'aggiunta al carrello.", Toast.LENGTH_SHORT).show());

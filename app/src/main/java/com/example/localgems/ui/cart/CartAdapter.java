@@ -1,6 +1,7 @@
 package com.example.localgems.ui.cart;
 
 import android.content.Context;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,6 +9,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.bumptech.glide.Glide;
 import com.example.localgems.R;
 import com.example.localgems.model.CartItem;
 
@@ -40,11 +42,18 @@ public class CartAdapter extends RecyclerView.Adapter<CartItemViewHolder> {
         double unitPrice = item.getProduct().getPrice();
         int quantity = item.getQuantity();
         double totalPrice = unitPrice * quantity;
-
+        Log.e("CARTLOAD ", "leggo PRODOTTO :" + item.getProduct().getId());
         holder.productName.setText(name);
         holder.productPrice.setText(String.format("€ %.2f x%d = € %.2f", unitPrice, quantity, totalPrice));
         holder.quantityText.setText(String.valueOf(quantity));
-        holder.productImage.setImageResource(R.drawable.placeholder_product);
+        Log.e("CARTLOAD ", "leggo PRODOTTO :" + item.getProduct().getImage_url());
+
+        Glide.with(context)
+                .load(item.getProduct().getImage_url())
+                .placeholder(R.drawable.placeholder_product) // immagine di default mentre carica
+                .error(R.drawable.placeholder_product)       // immagine se errore
+                .into(holder.productImage);
+
 
         holder.btnIncrease.setOnClickListener(v -> {
             item.increaseQuantity();

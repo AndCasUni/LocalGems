@@ -8,6 +8,7 @@ public class CartItem {
         this.product = product;
         this.quantity = quantity;
     }
+    public CartItem(){};
 
     public Product getProduct() {
         return product;
