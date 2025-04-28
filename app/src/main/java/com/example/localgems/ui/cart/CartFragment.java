@@ -19,6 +19,7 @@ import com.example.localgems.model.Product;
 import com.google.android.gms.tasks.Task;
 import com.google.android.gms.tasks.Tasks;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
@@ -64,7 +65,7 @@ public class CartFragment extends Fragment {
                         String name = documentSnapshot.getString("name");
                         Double price = documentSnapshot.getDouble("price");
                         String description = documentSnapshot.getString("description");
-                        String imageUrl = documentSnapshot.getString("imageUrl");
+                        String imageUrl = documentSnapshot.getString("image_url");
                         Long quantityLong = documentSnapshot.getLong("quantity");
                         int quantity = (quantityLong != null) ? quantityLong.intValue() : 0;
 
@@ -78,6 +79,8 @@ public class CartFragment extends Fragment {
 
                         // Costruisci il CartItem
                         CartItem cartItem = new CartItem(product, quantity);
+
+                        Log.e("LEGGIAMO ", "leggo PRODOTTO :" + cartItem.getProduct().getImage_url());
 
                         // Aggiungi all'array
                         cartItems.add(cartItem);
@@ -100,90 +103,103 @@ public class CartFragment extends Fragment {
             auth = FirebaseAuth.getInstance();
             userId = auth.getCurrentUser().getUid();
 
-            List<Task<Boolean>> availabilityTasksList = new ArrayList<>();
-            for (CartItem cartItem : cartItems) {
-                DocumentReference productRef = db.collection("products").document(cartItem.getProduct().getId());
-                Task<Boolean> task = productRef.get().continueWith(t -> {
-                    if (t.isSuccessful()) {
-                        Long stock = t.getResult().getLong("stock");
-                        if (stock == null) stock = 0L;
-                        return stock >= cartItem.getQuantity();
-                    } else {
-                        throw t.getException();
-                    }
-                });
-                availabilityTasksList.add(task);
-            }
+            CollectionReference cartRef = db.collection("users").document(userId).collection("cart");
+            CollectionReference productsRef = db.collection("products");
+            CollectionReference purchasesRef = db.collection("purchases");
+            DocumentReference userRef = db.collection("users").document(userId);
 
-            Task<List<Boolean>> availabilityTasks = Tasks.whenAllSuccess(availabilityTasksList);
-
-            availabilityTasks.addOnSuccessListener(results -> {
-                boolean allAvailable = true;
-                for (Object available : results) {
-                    if (!(Boolean) available) {
-                        allAvailable = false;
-                        break;
-                    }
-                }
-
-                if (!allAvailable) {
-                    Toast.makeText(requireContext(), "Disponibilità insufficiente per alcuni prodotti!", Toast.LENGTH_SHORT).show();
+// 1. Leggi tutti gli articoli nel carrello
+            cartRef.get().addOnSuccessListener(cartSnapshot -> {
+                if (cartSnapshot.isEmpty()) {
+                    Toast.makeText(requireContext(), "Carrello vuoto!", Toast.LENGTH_SHORT).show();
                     return;
                 }
 
-                // 2. Registra l'acquisto
-                Map<String, Object> purchaseData = new HashMap<>();
-                purchaseData.put("userId", userId);
-                purchaseData.put("timestamp", FieldValue.serverTimestamp());
-
                 List<Map<String, Object>> purchasedProducts = new ArrayList<>();
-                double total = 0;
+                WriteBatch batch = db.batch();
+                boolean[] hasInsufficientStock = {false};
 
-                for (CartItem cartItem : cartItems) {
-                    Map<String, Object> p = new HashMap<>();
-                    p.put("productId", cartItem.getProduct().getId());
-                    p.put("name", cartItem.getProduct().getName());
-                    p.put("quantity", cartItem.getQuantity());
-                    p.put("price", cartItem.getProduct().getPrice());
-                    purchasedProducts.add(p);
+                for (DocumentSnapshot cartItemDoc : cartSnapshot) {
+                    String productId = cartItemDoc.getId();
+                    int quantityInCart = cartItemDoc.getLong("quantity").intValue();
 
-                    total += cartItem.getQuantity() * cartItem.getProduct().getPrice();
-                }
+                    DocumentReference productDocRef = productsRef.document(productId);
 
-                purchaseData.put("products", purchasedProducts);
-                purchaseData.put("total", total);
+                    // Verifica disponibilità
+                    productDocRef.get().addOnSuccessListener(productSnapshot -> {
+                        if (productSnapshot.exists()) {
+                            int stockAvailable = productSnapshot.getLong("stock").intValue();
 
-                db.collection("purchases")
-                        .add(purchaseData)
-                        .addOnSuccessListener(documentReference -> {
-                            // 3. Aggiorna quantità stock dei prodotti
-                            WriteBatch batch = db.batch();
-                            for (CartItem cartItem : cartItems) {
-                                DocumentReference productRef = db.collection("products").document(cartItem.getProduct().getId());
-                                batch.update(productRef, "stock", FieldValue.increment(-cartItem.getQuantity()));
+                            if (stockAvailable < quantityInCart) {
+                                hasInsufficientStock[0] = true;
+                                Toast.makeText(requireContext(), "Prodotto " + productSnapshot.getString("name") + " non disponibile a sufficienza.", Toast.LENGTH_SHORT).show();
+                                return;
                             }
 
-                            // 4. Svuota carrello
-                            DocumentReference userCartRef = db.collection("users").document(userId);
-                            batch.update(userCartRef, "cart", new HashMap<>()); // oppure elimina i singoli prodotti se necessario
+                            // 2. Se tutto ok, prepara i dati per l'acquisto
+                            Map<String, Object> purchasedProduct = new HashMap<>();
+                            purchasedProduct.put("product_id", productId);
+                            purchasedProduct.put("name", productSnapshot.getString("name"));
+                            purchasedProduct.put("price", productSnapshot.getDouble("price"));
+                            purchasedProduct.put("quantity", quantityInCart);
+                            purchasedProducts.add(purchasedProduct);
 
-                            batch.commit()
-                                    .addOnSuccessListener(aVoid -> {
-                                        Toast.makeText(requireContext(), "Acquisto completato!", Toast.LENGTH_SHORT).show();
-                                        cartItems.clear();
-                                        cartAdapter.notifyDataSetChanged();  // aggiorna RecyclerView
-                                        updateTotal();
-                                    })
-                                    .addOnFailureListener(e -> {
-                                        Toast.makeText(requireContext(), "Errore nell'aggiornamento prodotti.", Toast.LENGTH_SHORT).show();
-                                    });
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(requireContext(), "Errore durante la registrazione dell'acquisto.", Toast.LENGTH_SHORT).show();
-                        });
+                            // 3. Scala la quantità disponibile nei prodotti
+                            batch.update(productDocRef, "stock", stockAvailable - quantityInCart);
 
+                            // 4. Cancella il prodotto dal carrello
+                            batch.delete(cartRef.document(productId));
+
+                            // --- Alla fine di tutti i prodotti ---
+                            if (purchasedProducts.size() == cartSnapshot.size()) {
+                                if (hasInsufficientStock[0]) {
+                                    return; // Se anche solo un prodotto era insufficiente, fermati
+                                }
+
+                                // 5. Crea ID acquisto incrementale
+                                db.collection("purchases").get().addOnSuccessListener(purchaseSnapshot -> {
+                                    int nextPurchaseId = purchaseSnapshot.size() + 1;
+                                    String purchaseId = String.format("purch%03d", nextPurchaseId);
+
+                                    // 6. Crea l'acquisto
+                                    Map<String, Object> purchaseData = new HashMap<>();
+                                    purchaseData.put("user_id", userId);
+                                    purchaseData.put("products", purchasedProducts);
+                                    purchaseData.put("timestamp", FieldValue.serverTimestamp());
+
+                                    batch.set(purchasesRef.document(purchaseId), purchaseData);
+
+                                    // 7. Aggiungi purchaseId alla lista purchases dell'utente
+                                    batch.update(userRef, "purchases", FieldValue.arrayUnion(purchaseId));
+
+                                    // 8. Commit finale
+                                    batch.commit()
+                                            .addOnSuccessListener(aVoid -> {
+                                                Toast.makeText(requireContext(), "Acquisto completato!", Toast.LENGTH_SHORT).show();
+                                                cartItems.clear();
+                                                cartAdapter.notifyDataSetChanged();
+                                                updateTotal();
+                                            })
+                                            .addOnFailureListener(e -> {
+                                                Toast.makeText(requireContext(), "Errore nel completare l'acquisto.", Toast.LENGTH_SHORT).show();
+                                            });
+
+                                }).addOnFailureListener(e -> {
+                                    Toast.makeText(requireContext(), "Errore nella creazione ID acquisto.", Toast.LENGTH_SHORT).show();
+                                });
+                            }
+
+                        } else {
+                            Toast.makeText(requireContext(), "Prodotto non trovato.", Toast.LENGTH_SHORT).show();
+                        }
+
+                    }).addOnFailureListener(e -> {
+                        Toast.makeText(requireContext(), "Errore nel recuperare prodotto.", Toast.LENGTH_SHORT).show();
+                    });
+
+                }
             }).addOnFailureListener(e -> {
-                Toast.makeText(requireContext(), "Errore nel controllo disponibilità.", Toast.LENGTH_SHORT).show();
+                Toast.makeText(requireContext(), "Errore nel recuperare carrello.", Toast.LENGTH_SHORT).show();
             });
         });
 

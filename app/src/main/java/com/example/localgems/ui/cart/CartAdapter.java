@@ -42,11 +42,12 @@ public class CartAdapter extends RecyclerView.Adapter<CartItemViewHolder> {
         double unitPrice = item.getProduct().getPrice();
         int quantity = item.getQuantity();
         double totalPrice = unitPrice * quantity;
-        Log.e("CARTLOAD ", "leggo PRODOTTO :" + item.getProduct().getId());
         holder.productName.setText(name);
         holder.productPrice.setText(String.format("€ %.2f x%d = € %.2f", unitPrice, quantity, totalPrice));
         holder.quantityText.setText(String.valueOf(quantity));
         Log.e("CARTLOAD ", "leggo PRODOTTO :" + item.getProduct().getImage_url());
+        Log.e("CARTLOAD ", "leggo PRODOTTO :" + item.getProduct().getName());
+
 
         Glide.with(context)
                 .load(item.getProduct().getImage_url())
