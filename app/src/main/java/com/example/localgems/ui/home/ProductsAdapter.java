@@ -52,6 +52,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         Log.d("ADAPTER", "Bind del prodotto: " + product.getName());
 
         holder.nameTextView.setText(product.getName());
+        holder.ratingView.setText("(" +product.getRating() + "★)");
         holder.descriptionTextView.setText(product.getDescription());
         holder.priceTextView.setText(String.format("€ %.2f", product.getPrice()));
 
@@ -68,6 +69,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
             Log.d("URL", "URL DOPO: " + product.getImage_url());
             bundle.putString("productId", product.getId());  // Passi solo l'ID del prodotto
             bundle.putString("imageURL", product.getImage_url());
+            bundle.putDouble("rating", product.getRating());
             Navigation.findNavController(v).navigate(R.id.nav_product_details, bundle);
         });
     }
@@ -80,7 +82,7 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
     // ViewHolder: definisce gli elementi visivi di ogni item
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
-        TextView nameTextView, descriptionTextView, priceTextView;
+        TextView nameTextView, descriptionTextView, priceTextView, ratingView;
 
         ImageView imageView;
         Button addToCartButton;
@@ -88,9 +90,11 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nameTextView = itemView.findViewById(R.id.product_name);
+
             descriptionTextView = itemView.findViewById(R.id.product_description);
             priceTextView = itemView.findViewById(R.id.product_price);
             imageView = itemView.findViewById(R.id.product_image);
+            ratingView = itemView.findViewById(R.id.item_product_seller_name);
             //addToCartButton = itemView.findViewById(R.id.add_to_cart_button);
         }
 

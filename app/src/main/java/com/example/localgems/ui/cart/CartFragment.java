@@ -53,7 +53,6 @@ public class CartFragment extends Fragment {
         recyclerView = view.findViewById(R.id.cart_recycler_view);
         buyNowButton = view.findViewById(R.id.buy_now_button);
 
-
         db.collection("users")
                 .document(userId)
                 .collection("cart")
@@ -84,6 +83,7 @@ public class CartFragment extends Fragment {
 
                         // Aggiungi all'array
                         cartItems.add(cartItem);
+
                     }
 
                     // Qui hai l'array cartItems pieno!
@@ -108,6 +108,7 @@ public class CartFragment extends Fragment {
             CollectionReference purchasesRef = db.collection("purchases");
             DocumentReference userRef = db.collection("users").document(userId);
 
+
 // 1. Leggi tutti gli articoli nel carrello
             cartRef.get().addOnSuccessListener(cartSnapshot -> {
                 if (cartSnapshot.isEmpty()) {
@@ -118,6 +119,8 @@ public class CartFragment extends Fragment {
                 List<Map<String, Object>> purchasedProducts = new ArrayList<>();
                 WriteBatch batch = db.batch();
                 boolean[] hasInsufficientStock = {false};
+
+                double[] totalPrice = {0.0}; // per mantenere somma totale
 
                 for (DocumentSnapshot cartItemDoc : cartSnapshot) {
                     String productId = cartItemDoc.getId();
@@ -142,7 +145,12 @@ public class CartFragment extends Fragment {
                             purchasedProduct.put("name", productSnapshot.getString("name"));
                             purchasedProduct.put("price", productSnapshot.getDouble("price"));
                             purchasedProduct.put("quantity", quantityInCart);
+                            purchasedProduct.put("image_url", productSnapshot.getString("image_url"));
+
                             purchasedProducts.add(purchasedProduct);
+
+                            double price = productSnapshot.getDouble("price");
+                            totalPrice[0] += price * quantityInCart;
 
                             // 3. Scala la quantità disponibile nei prodotti
                             batch.update(productDocRef, "stock", stockAvailable - quantityInCart);
@@ -162,14 +170,29 @@ public class CartFragment extends Fragment {
                                     String purchaseId = String.format("purch%03d", nextPurchaseId);
 
                                     // 6. Crea l'acquisto
+                                    DocumentReference purchaseDocRef = purchasesRef.document(purchaseId);
+
+// 1. Dati generali dell'acquisto
                                     Map<String, Object> purchaseData = new HashMap<>();
                                     purchaseData.put("user_id", userId);
-                                    purchaseData.put("products", purchasedProducts);
+                                    purchaseData.put("total_price", totalPrice[0]);
                                     purchaseData.put("timestamp", FieldValue.serverTimestamp());
 
-                                    batch.set(purchasesRef.document(purchaseId), purchaseData);
+                                    batch.set(purchaseDocRef, purchaseData);
 
-                                    // 7. Aggiungi purchaseId alla lista purchases dell'utente
+// 2. Aggiungi ogni prodotto alla sottocollezione productsPurchased
+                                    for (Map<String, Object> purchased : purchasedProducts) {
+                                        String prodId = (String) purchased.get("product_id");
+
+                                        Map<String, Object> productData = new HashMap<>();
+                                        productData.put("name", purchased.get("name"));
+                                        productData.put("price", purchased.get("price"));
+                                        productData.put("quantity", purchased.get("quantity"));
+                                        productData.put("image_url", purchased.get("image_url"));
+
+                                        DocumentReference productPurchasedRef = purchaseDocRef.collection("productsPurchased").document(prodId);
+                                        batch.set(productPurchasedRef, productData);
+                                    }
                                     batch.update(userRef, "purchases", FieldValue.arrayUnion(purchaseId));
 
                                     // 8. Commit finale

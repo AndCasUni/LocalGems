@@ -38,6 +38,7 @@ public class ProductDetailFragment extends Fragment {
     private Button quantityMinusButton;
 
     private int quantity = 1;
+    double rating = 0;
 
     String ID = null;
     String imageURL = null;
@@ -62,10 +63,10 @@ public class ProductDetailFragment extends Fragment {
         assert user != null;
         String userId = user.getUid();
         Bundle bundle = getArguments();
-
         if (bundle != null) {
             ID = bundle.getString("productId");
-            imageURL = bundle.getString("imageURL"); // <-- Qui prendi il valore
+            imageURL = bundle.getString("imageURL");
+            rating = bundle.getDouble("rating");
         }
 
         Log.d("URL", "URLLETTO: " + imageURL);
@@ -90,35 +91,48 @@ public class ProductDetailFragment extends Fragment {
         });
 
         addToCartButton.setOnClickListener(v -> {
-            String productId = ID; // ID già preso dal bundle
-            String name = productName.getText().toString();
-            String priceString = productPrice.getText().toString().replace("€", "").trim();
-            double price = Double.parseDouble(priceString);
-            String description = productDescription.getText().toString();
-            String imageUrl = imageURL; // usa l'imageURL che hai già letto dal bundle
-
-            int quantity = Integer.parseInt(quantityText.getText().toString());
-
-            // Crea la mappa dei dati da inserire
-            Map<String, Object> cartItem = new HashMap<>();
-            cartItem.put("id", productId);
-            cartItem.put("name", name);
-            cartItem.put("quantity", quantity);
-            cartItem.put("price", price);
-            cartItem.put("description", description);
-            cartItem.put("image_url", imageUrl);
-
-            // Salva nel database
             FirebaseFirestore db = FirebaseFirestore.getInstance();
+
             db.collection("users")
                     .document(userId)
                     .collection("cart")
-                    .document(productId)
-                    .set(cartItem)
-                    .addOnSuccessListener(aVoid ->
-                            Toast.makeText(getContext(), "Articolo aggiunto al carrello!", Toast.LENGTH_SHORT).show())
+                    .document(ID)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            // Se esiste già
+                            Toast.makeText(getContext(), "Prodotto già presente nel carrello", Toast.LENGTH_SHORT).show();
+                        } else {
+                            // Altrimenti, aggiungi
+                            String name = productName.getText().toString();
+                            String priceString = productPrice.getText().toString().replace("€", "").trim();
+                            double price = Double.parseDouble(priceString);
+                            String description = productDescription.getText().toString();
+                            String imageUrl = imageURL;
+                            int quantity = Integer.parseInt(quantityText.getText().toString());
+
+                            Map<String, Object> cartItem = new HashMap<>();
+                            cartItem.put("id", ID);
+                            cartItem.put("name", name);
+                            cartItem.put("rating", rating);
+                            cartItem.put("quantity", quantity);
+                            cartItem.put("price", price);
+                            cartItem.put("description", description);
+                            cartItem.put("image_url", imageUrl);
+
+                            db.collection("users")
+                                    .document(userId)
+                                    .collection("cart")
+                                    .document(ID)
+                                    .set(cartItem)
+                                    .addOnSuccessListener(aVoid ->
+                                            Toast.makeText(getContext(), "Articolo aggiunto al carrello!", Toast.LENGTH_SHORT).show())
+                                    .addOnFailureListener(e ->
+                                            Toast.makeText(getContext(), "Errore nell'aggiunta al carrello.", Toast.LENGTH_SHORT).show());
+                        }
+                    })
                     .addOnFailureListener(e ->
-                            Toast.makeText(getContext(), "Errore nell'aggiunta al carrello.", Toast.LENGTH_SHORT).show());
+                            Toast.makeText(getContext(), "Errore nel controllo del carrello.", Toast.LENGTH_SHORT).show());
         });
         String productId = getArguments() != null ? getArguments().getString("productId") : null;
 

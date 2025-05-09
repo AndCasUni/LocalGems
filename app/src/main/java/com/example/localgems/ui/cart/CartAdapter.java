@@ -43,6 +43,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartItemViewHolder> {
         int quantity = item.getQuantity();
         double totalPrice = unitPrice * quantity;
         holder.productName.setText(name);
+        holder.rating.setText("(" + item.getProduct().getRating() + "★)");
         holder.productPrice.setText(String.format("€ %.2f x%d = € %.2f", unitPrice, quantity, totalPrice));
         holder.quantityText.setText(String.valueOf(quantity));
         Log.e("CARTLOAD ", "leggo PRODOTTO :" + item.getProduct().getImage_url());
@@ -69,10 +70,24 @@ public class CartAdapter extends RecyclerView.Adapter<CartItemViewHolder> {
         });
 
         holder.btnDelete.setOnClickListener(v -> {
+            // Rimuovi visivamente dalla lista
             cartItemList.remove(position);
             notifyItemRemoved(position);
             notifyItemRangeChanged(position, cartItemList.size());
             onCartChanged.run();
+
+            // Rimuovi dal database
+            String productId = item.getProduct().getId();
+            String userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+            com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                    .collection("users")
+                    .document(userId)
+                    .collection("cart")
+                    .document(productId)
+                    .delete()
+                    .addOnSuccessListener(aVoid -> Log.d("CartAdapter", "Prodotto rimosso dal carrello nel DB: " + productId))
+                    .addOnFailureListener(e -> Log.e("CartAdapter", "Errore nella rimozione dal carrello: " + productId, e));
         });
     }
 
