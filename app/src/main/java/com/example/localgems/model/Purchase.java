@@ -12,6 +12,9 @@ public class Purchase {
 
     public Purchase() {}
 
+    public Purchase(String id, double total_price, String date, String user_id) {
+    }
+
     public String getId() {return this.id;}
 
     public String getUser_id() { return user_id;}
@@ -19,4 +22,7 @@ public class Purchase {
     public double getTotalPrice() { return total_price;}
 
 
+    public String getDate() {
+        return date;
+    }
 }

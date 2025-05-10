@@ -13,4 +13,5 @@
     <color name="orange_200">#FFE082</color> <!-- Tonalità chiara -->
     <color name="orange_500">#FFC107</color> <!-- Colore principale -->
     <color name="orange_700">#FFA000</color> <!-- Tonalità scura -->
+    <color name="gray">#757575</color>
 </resources>

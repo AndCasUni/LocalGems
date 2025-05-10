@@ -26,10 +26,41 @@
     <string name="show_on_map">Show on map</string>
     <string name="delivery_available">Delivery available</string>
 
+    <!-- fragment_account -->
+    <string name="account_title">Il tuo profilo</string>
+    <string name="account_email">Email</string>
+    <string name="account_first_name">Nome</string>
+    <string name="account_last_name">Cognome</string>
+    <string name="account_birth_date">Data di Nascita</string>
+    <string name="account_seeOrders">See Orders</string>
+    <string name="account_logout">Logout</string>
+
     <!-- fragment_login -->
     <string name="loginMessage">¡Debes iniciar sesión primero para ver tu carrito!</string>
     <string name="emailEditText">Correo</string>
     <string name="passwordEditText">Contraseña</string>
     <string name="loginButton">Entra</string>
     <string name="registerText">¿No tienes una cuenta? ¡Créala ahora!</string>
+
+    <!-- fragment_register -->
+    <string name="registerMessage">¡Crea tu cuenta!</string>
+    <string name="registerButton">Registrarse</string>
+    <string name="firstNameHint">Nombre</string>
+    <string name="lastNameHint">Apellido</string>
+    <string name="birthDateHint">Fecha de Nacimiento</string>
+    <string name="acceptTermsText">He leído y acepto los <a href="https://example.com/termini">términos y condiciones</a> y la <a href="https://example.com/privacy">informativa de privacy</a>.</string>
+    <string name="loginText">¿Ya tienes una cuenta? ¡Inicia sesión!</string>
+
+    <!-- Filtri per le stelle -->
+    <string name="filter_5_stars">5 estrellas</string>
+    <string name="filter_4_stars">4 estrellas</string>
+    <string name="filter_3_stars">3 estrellas</string>
+    <string name="filter_2_stars">2 estrellas</string>
+    <string name="filter_1_star">1 estrella</string>
+
+    <!-- Testi dinamici -->
+    <string name="total_reviews">Reseñas totales: %1$d</string>
+    <string name="loading_reviews">Cargando reseñas...</string>
+    <string name="no_reviews">No hay reseñas disponibles.</string>
+    <string name="error_loading_reviews">Error al cargar las reseñas.</string>
 </resources>

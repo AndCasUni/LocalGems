@@ -1,24 +1,41 @@
 package com.example.localgems.model;
 
-public class Review
-{
-    private String userId;
-    private String comment;
-    private String date;
-    private Integer rating;
+public class Review {
+    private String author;
+    private String content;
+    private String stars;
 
-    public Review(){}
+    public Review() {
+        // Costruttore vuoto richiesto da Firestore
+    }
 
-    public String getUserId(){ return userId;}
-    public void setUserId(String user) { userId = user;}
+    public Review(String author, String content, String stars) {
+        this.author = author != null ? author : "Anonimo";
+        this.content = content != null ? content : "Nessun contenuto";
+        this.stars = stars != null ? stars : "0";
+    }
 
-    public String getComment(){ return comment;}
-    public void setComment(String comment) { this.comment = comment;}
+    public String getAuthor() {
+        return author;
+    }
 
-    public String getDate (){ return date;}
-    public void setDate(String date) { this.date = date;}
+    public void setAuthor(String author) {
+        this.author = author;
+    }
 
-    public Integer getRating(){ return rating;}
-    public void setRating(Integer rating) { this.rating = rating ;}
+    public String getContent() {
+        return content;
+    }
 
+    public void setContent(String content) {
+        this.content = content;
+    }
+
+    public String getStars() {
+        return stars;
+    }
+
+    public void setStars(String stars) {
+        this.stars = stars;
+    }
 }

@@ -49,11 +49,7 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/product_vendor" />
 
-
-
     <!-- Prezzo -->
-
-
     <TextView
         android:id="@+id/product_price"
         android:layout_width="wrap_content"
@@ -64,8 +60,6 @@
         app:layout_constraintStart_toStartOf="parent" />
 
     <!-- Selezione quantità -->
-
-    <!-- Pulsante aggiungi al carrello -->
     <LinearLayout
         android:id="@+id/quantity_selector"
         android:layout_width="0dp"
@@ -136,17 +130,12 @@
         app:layout_constraintTop_toBottomOf="@+id/quantity_selector" />
 
     <!-- Recensioni -->
-    <TextView
-        android:id="@+id/seller_reviews"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
-        android:layout_margin="16dp"
-        android:text="@string/seller_reviews"
-        app:layout_constraintTop_toBottomOf="@id/add_to_cart_button"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+
+    <!-- Filtri per le recensioni -->
+
 
     <!-- Shopping Cart button (to be placed in the bottom right corner) -->
+
     <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/cart_fab"
         android:layout_width="wrap_content"
@@ -157,5 +146,228 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent" />
 
+    <!-- Sezione per le recensioni -->
+
+    <LinearLayout
+        android:id="@+id/reviews_summary_section"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:orientation="vertical"
+        app:layout_constraintTop_toBottomOf="@id/add_to_cart_button"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <TextView
+            android:id="@+id/reviews_summary_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/seller_reviews"
+            android:textStyle="bold"
+            android:textSize="16sp"
+            android:layout_marginBottom="8dp" />
+
+        <!-- Ciclo da 5 a 1 stelle -->
+        <LinearLayout
+            android:id="@+id/reviews_summary_stars_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- 5 stars -->
+            <LinearLayout
+                android:id="@+id/review_row_5"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/star_button_5"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="5 ★"
+                    android:textSize="14sp"
+                    android:minWidth="48dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_5"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:progress="0"
+                    android:max="100"
+                    android:progressDrawable="@drawable/review_progress_drawable" />
+
+                <TextView
+                    android:id="@+id/percentage_5"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- 4 stars -->
+            <LinearLayout
+                android:id="@+id/review_row_4"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/star_button_4"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="4 ★"
+                    android:textSize="14sp"
+                    android:minWidth="48dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_4"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:progress="0"
+                    android:max="100"
+                    android:progressDrawable="@drawable/review_progress_drawable" />
+
+                <TextView
+                    android:id="@+id/percentage_4"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- 3 stars -->
+            <LinearLayout
+                android:id="@+id/review_row_3"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/star_button_3"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3 ★"
+                    android:textSize="14sp"
+                    android:minWidth="48dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_3"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:progress="0"
+                    android:max="100"
+                    android:progressDrawable="@drawable/review_progress_drawable" />
+
+                <TextView
+                    android:id="@+id/percentage_3"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- 2 stars -->
+            <LinearLayout
+                android:id="@+id/review_row_2"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <Button
+                    android:id="@+id/star_button_2"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2 ★"
+                    android:textSize="14sp"
+                    android:minWidth="48dp" />
+
+                <ProgressBar
+                    android:id="@+id/progress_2"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:progress="0"
+                    android:max="100"
+                    android:progressDrawable="@drawable/review_progress_drawable" />
+
+                <TextView
+                    android:id="@+id/percentage_2"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+            <!-- 1 star -->
+
+            <LinearLayout
+                android:id="@+id/review_row_1"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+                <Button
+                    android:id="@+id/star_button_1"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="1 ★"
+                    android:textSize="14sp"
+                    android:minWidth="48dp" />
+                <ProgressBar
+                    android:id="@+id/progress_1"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="16dp"
+                    android:layout_marginHorizontal="8dp"
+                    android:layout_weight="1"
+                    android:progress="0"
+                    android:max="100"
+                    android:progressDrawable="@drawable/review_progress_drawable" />
+                <TextView
+                    android:id="@+id/percentage_1"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="0%"
+                    android:textSize="12sp" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </LinearLayout>
+
+    <!-- Lista di recensioni -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/reviews_recycler_view"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:padding="8dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/reviews_summary_section"
+        tools:listitem="@layout/item_review" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

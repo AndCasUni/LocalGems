@@ -1,6 +1,8 @@
 package com.example.localgems.ui.account;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,14 +14,19 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.navigation.Navigation;
 
+import com.example.localgems.LoginActivity;
 import com.example.localgems.R;
 import com.example.localgems.model.User;
+import com.example.localgems.ui.orders.OrdersFragment;
+import com.google.firebase.auth.FirebaseAuth;
 
 public class AccountFragment extends Fragment {
 
     private TextView emailText, nameText, lastNameText, birthDateText;
-    private Button changePasswordButton;
+    private Button seeOrdersButton, logoutButton;
 
     private User currentUser;
 
@@ -27,6 +34,7 @@ public class AccountFragment extends Fragment {
         // Required empty public constructor
     }
 
+    @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
@@ -37,7 +45,8 @@ public class AccountFragment extends Fragment {
         nameText = view.findViewById(R.id.account_first_name);
         lastNameText = view.findViewById(R.id.account_last_name);
         birthDateText = view.findViewById(R.id.account_birth_date);
-        changePasswordButton = view.findViewById(R.id.change_password_button);
+        seeOrdersButton = view.findViewById(R.id.account_see_orders_button);
+        logoutButton = view.findViewById(R.id.account_logout_button);
 
         // Simulating a user object, normally fetched from backend or database
         currentUser = new User("user@example.com", "Mario", "Rossi", "15/03/1990", "password123");
@@ -49,43 +58,34 @@ public class AccountFragment extends Fragment {
         birthDateText.setText(currentUser.getBirthDate());
 
         // Handle password change button click
-        changePasswordButton.setOnClickListener(v -> showChangePasswordDialog());
+        seeOrdersButton.setOnClickListener(v -> showOrdersFragment());
+
+        // Handle logout button click
+        logoutButton.setOnClickListener(v -> doLogout());
 
         return view;
     }
 
-    private void showChangePasswordDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(getContext());
-        builder.setTitle("Change Password");
+    private void showOrdersFragment() {
+        Navigation.findNavController(getView())
+                .navigate(R.id.nav_orders);
+    }
 
-        View dialogView = getLayoutInflater().inflate(R.layout.dialog_change_password, null);
-        builder.setView(dialogView);
+    private void doLogout() {
+        // Show confirmation dialog
+        new AlertDialog.Builder(getContext())
+                .setTitle("Logout")
+                .setMessage("Are you sure you want to logout?")
+                .setPositiveButton("Yes", (dialog, which) -> {
+                    // Perform logout action
+                    FirebaseAuth.getInstance().signOut();
+                    Toast.makeText(getContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
+                    // Navigate to login screen or main screen
+                    startActivity(new Intent(getActivity(), LoginActivity.class));
+                    requireActivity().finish();
 
-        EditText oldPassword = dialogView.findViewById(R.id.old_password);
-        EditText newPassword = dialogView.findViewById(R.id.new_password);
-        EditText confirmPassword = dialogView.findViewById(R.id.confirm_password);
-
-        builder.setPositiveButton("Confirm", (dialog, which) -> {
-            String old = oldPassword.getText().toString();
-            String newP = newPassword.getText().toString();
-            String confirm = confirmPassword.getText().toString();
-
-            // Check if old password matches
-            if (!old.equals("pipppo")) {
-                Toast.makeText(getContext(), "Incorrect current password", Toast.LENGTH_SHORT).show();
-            }
-            // Check if new passwords match
-            else if (!newP.equals(confirm)) {
-                Toast.makeText(getContext(), "New passwords do not match", Toast.LENGTH_SHORT).show();
-            }
-            // All good, update password
-            else {
-                //currentUser.setPassword(newP);
-                Toast.makeText(getContext(), "Password successfully updated", Toast.LENGTH_SHORT).show();
-            }
-        });
-
-        builder.setNegativeButton("Cancel", (dialog, which) -> dialog.dismiss());
-        builder.show();
+                })
+                .setNegativeButton("No", null)
+                .show();
     }
 }

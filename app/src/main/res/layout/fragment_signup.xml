@@ -1,0 +1,199 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="24dp"
+    android:background="@drawable/bg_login"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/registerMessage"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/registerMessage"
+            android:textSize="18sp"
+            android:textColor="@android:color/white"
+            android:layout_marginBottom="32dp"
+            android:textAlignment="center" />
+
+        <!-- Nome -->
+        <EditText
+            android:id="@+id/input_first_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="@string/firstNameHint"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/error_first_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Campo obbligatorio"
+            android:textColor="#FF0000"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Cognome -->
+        <EditText
+            android:id="@+id/input_last_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="@string/lastNameHint"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/error_last_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Campo obbligatorio"
+            android:textColor="#FF0000"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Data di nascita -->
+        <EditText
+            android:id="@+id/input_birth_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="@string/birthDateHint"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white"
+            android:focusable="false"
+            android:clickable="true" />
+
+        <TextView
+            android:id="@+id/error_birth_date"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Campo obbligatorio"
+            android:textColor="#FF0000"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Email -->
+        <EditText
+            android:id="@+id/input_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="@string/emailEditText"
+            android:inputType="textEmailAddress"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/error_email"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Campo obbligatorio"
+            android:textColor="#FF0000"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Password -->
+        <EditText
+            android:id="@+id/input_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="4dp"
+            android:backgroundTint="@android:color/white"
+            android:hint="@string/passwordEditText"
+            android:inputType="textPassword"
+            android:textColor="@android:color/white"
+            android:textColorHint="@android:color/white" />
+
+        <TextView
+            android:id="@+id/error_password"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Campo obbligatorio"
+            android:textColor="#FF0000"
+            android:textSize="12sp"
+            android:visibility="gone"
+            android:layout_marginBottom="12dp"/>
+
+        <!-- Checkbox e termini di servizio -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginBottom="24dp">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical">
+
+                <CheckBox
+                    android:id="@+id/checkbox_terms"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:buttonTint="@android:color/white" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/acceptTermsText"
+                    android:textColor="@android:color/white"
+                    android:textSize="14sp"
+                    android:autoLink="web"
+                    android:linksClickable="true" />
+            </LinearLayout>
+
+            <TextView
+                android:id="@+id/terms_error"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Devi accettare i termini di servizio per registrarti"
+                android:textColor="#FF0000"
+                android:textSize="12sp"
+                android:visibility="gone" />
+        </LinearLayout>
+
+        <!-- Bottone Registrati -->
+        <Button
+            android:id="@+id/button_register"
+            style="@style/Widget.Material3.Button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginBottom="16dp"
+            android:backgroundTint="#4CAF50"
+            android:text="@string/registerButton"
+            android:textColor="@android:color/white"
+            android:textSize="20sp" />
+
+        <!-- Link per il Login -->
+        <Button
+            android:id="@+id/button_login"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:text="@string/loginText"
+            android:textColor="@android:color/white"
+            android:textSize="14sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+</ScrollView>

@@ -1,4 +1,4 @@
-/* package com.example.localgems.ui.login;
+package com.example.localgems.ui.login;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,11 +11,11 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
 import com.example.localgems.MainActivity;
 import com.example.localgems.R;
+import com.example.localgems.ui.register.SignupFragment;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
@@ -23,83 +23,55 @@ public class LoginFragment extends Fragment {
 
     private FirebaseAuth mAuth;
     private EditText emailInput, passwordInput;
-    private Button loginBtn, registerBtn;
-
-    @Nullable
-    @Override
-    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container,
-                             @Nullable Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.activity_login, container, false);
-    }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_login, container, false);
 
         mAuth = FirebaseAuth.getInstance();
 
-        // Initialize input fields and buttons
         emailInput = view.findViewById(R.id.input_email);
         passwordInput = view.findViewById(R.id.input_password);
-        loginBtn = view.findViewById(R.id.button_login);
-        registerBtn = view.findViewById(R.id.button_register);
+        Button loginBtn = view.findViewById(R.id.button_login);
+        Button registerBtn = view.findViewById(R.id.button_register);
 
-        // Handle login click
         loginBtn.setOnClickListener(v -> loginUser());
+        registerBtn.setOnClickListener(v -> showRegistrationFragment());
 
-        // Handle registration click
-        registerBtn.setOnClickListener(v -> registerUser());
+        return view;
     }
 
     private void loginUser() {
         String email = emailInput.getText().toString();
         String password = passwordInput.getText().toString();
 
-        // Basic input check
         if (email.isEmpty() || password.isEmpty()) {
-            Toast.makeText(requireContext(), "Please fill in all fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(requireContext(), "Compila tutti i campi", Toast.LENGTH_SHORT).show();
             return;
         }
 
-        // Try to log the user in
         mAuth.signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(requireActivity(), task -> {
                     if (task.isSuccessful()) {
                         FirebaseUser user = mAuth.getCurrentUser();
-                        Toast.makeText(requireContext(), "Logged in successfully", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(requireContext(), "Login effettuato!", Toast.LENGTH_SHORT).show();
 
-                        // Move to main screen
-                        Intent intent = new Intent(requireContext(), MainActivity.class);
+                        // Chiudi l'activity padre e apri MainActivity
+                        Intent intent = new Intent(getActivity(), MainActivity.class);
                         startActivity(intent);
                         requireActivity().finish();
                     } else {
-                        Log.w("LOGIN", "Login failed", task.getException());
-                        Toast.makeText(requireContext(), "Wrong email or password", Toast.LENGTH_SHORT).show();
+                        Log.w("LOGIN", "Errore login", task.getException());
+                        Toast.makeText(requireContext(), "Email o password errati", Toast.LENGTH_SHORT).show();
                     }
                 });
     }
 
-    private void registerUser() {
-        String email = emailInput.getText().toString();
-        String password = passwordInput.getText().toString();
-
-        // Basic input validation
-        if (email.isEmpty() || password.length() < 6) {
-            Toast.makeText(requireContext(), "Enter a valid email and password (6+ characters)", Toast.LENGTH_SHORT).show();
-            return;
-        }
-
-        // Try to register the user
-        mAuth.createUserWithEmailAndPassword(email, password)
-                .addOnCompleteListener(requireActivity(), task -> {
-                    if (task.isSuccessful()) {
-                        Toast.makeText(requireContext(), "Registration successful! You can now log in", Toast.LENGTH_SHORT).show();
-                    } else {
-                        Log.w("REGISTER", "Registration failed", task.getException());
-                        Toast.makeText(requireContext(), "Something went wrong while registering", Toast.LENGTH_SHORT).show();
-                    }
-                });
+    private void showRegistrationFragment() {
+        // Sostituisci con il fragment di registrazione
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new SignupFragment())
+                .addToBackStack(null)
+                .commit();
     }
 }
-*/

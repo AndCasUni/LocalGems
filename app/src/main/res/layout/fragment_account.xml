@@ -70,16 +70,13 @@
             android:layout_marginBottom="24dp" />
 
         <Button
-            android:id="@+id/change_password_button"
+            android:id="@+id/account_see_orders_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Cambia password"
-            android:backgroundTint="@color/green_500"
-            android:textColor="@android:color/white"
-            android:padding="12dp"/>
+            android:text="@string/account_seeOrders" />
 
         <Button
-            android:id="@+id/logout_button"
+            android:id="@+id/account_logout_button"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:text="Esegui il logout"
