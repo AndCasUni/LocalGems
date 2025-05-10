@@ -177,10 +177,6 @@ public class HomeFragment extends Fragment {
     // Metodo fittizio per ottenere i prodotti
     private List<Product> getProducts() {
 
-
-       // products.add(new Product("Prodotto 1", 9.99));
-        //products.add(new Product("Prodotto 2", 14.99));
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("products")

@@ -66,6 +66,7 @@ public class CartFragment extends Fragment {
                         String description = documentSnapshot.getString("description");
                         String imageUrl = documentSnapshot.getString("image_url");
                         Long quantityLong = documentSnapshot.getLong("quantity");
+                        double rating = documentSnapshot.getDouble("rating");
                         int quantity = (quantityLong != null) ? quantityLong.intValue() : 0;
 
                         // Costruisci l'oggetto Product
@@ -75,11 +76,10 @@ public class CartFragment extends Fragment {
                         product.setPrice(price);
                         product.setDescription(description);
                         product.setImage_url(imageUrl);
+                        product.setRating(rating);
 
                         // Costruisci il CartItem
                         CartItem cartItem = new CartItem(product, quantity);
-
-                        Log.e("LEGGIAMO ", "leggo PRODOTTO :" + cartItem.getProduct().getImage_url());
 
                         // Aggiungi all'array
                         cartItems.add(cartItem);

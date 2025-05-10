@@ -69,8 +69,6 @@ public class ProductDetailFragment extends Fragment {
             rating = bundle.getDouble("rating");
         }
 
-        Log.d("URL", "URLLETTO: " + imageURL);
-
         Glide.with(requireContext())
                 .load(imageURL)
                 .placeholder(R.drawable.placeholder_product) // Un'icona mentre carica

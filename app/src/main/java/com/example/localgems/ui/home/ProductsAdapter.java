@@ -61,12 +61,10 @@ public class ProductsAdapter extends RecyclerView.Adapter<ProductsAdapter.ViewHo
                 .load(product.getImage_url())
                 .placeholder(R.drawable.placeholder_product)
                 .into(holder.imageView);
-        Log.d("URL", "URL: " + product.getImage_url());
 
 
         holder.itemView.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
-            Log.d("URL", "URL DOPO: " + product.getImage_url());
             bundle.putString("productId", product.getId());  // Passi solo l'ID del prodotto
             bundle.putString("imageURL", product.getImage_url());
             bundle.putDouble("rating", product.getRating());
