@@ -175,7 +175,7 @@ public class CartFragment extends Fragment {
 // 1. Dati generali dell'acquisto
                                     Map<String, Object> purchaseData = new HashMap<>();
                                     purchaseData.put("user_id", userId);
-                                    purchaseData.put("total_price", totalPrice[0]);
+                                    purchaseData.put("total_price", Math.round(totalPrice[0] * 100.0) / 100.0);
                                     purchaseData.put("timestamp", FieldValue.serverTimestamp());
 
                                     batch.set(purchaseDocRef, purchaseData);
@@ -189,6 +189,7 @@ public class CartFragment extends Fragment {
                                         productData.put("price", purchased.get("price"));
                                         productData.put("quantity", purchased.get("quantity"));
                                         productData.put("image_url", purchased.get("image_url"));
+                                        productData.put("reviewed", false);
 
                                         DocumentReference productPurchasedRef = purchaseDocRef.collection("productsPurchased").document(prodId);
                                         batch.set(productPurchasedRef, productData);

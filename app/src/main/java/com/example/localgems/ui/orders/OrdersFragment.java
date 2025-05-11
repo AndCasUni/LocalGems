@@ -1,6 +1,7 @@
 package com.example.localgems.ui.orders;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -12,8 +13,13 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.localgems.R;
 import com.example.localgems.model.Purchase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class OrdersFragment extends Fragment {
@@ -32,14 +38,56 @@ public class OrdersFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
-        // Dummy data - sostituire con dati reali
-        List<Purchase> purchases = new ArrayList<>();
-        purchases.add(new Purchase("1", 49.99, "2023-10-15", "user123"));
-        purchases.add(new Purchase("2", 99.50, "2023-10-14", "user456"));
-
-        adapter = new PurchaseAdapter(purchases);
+        adapter = new PurchaseAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
+
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        FirebaseAuth auth = FirebaseAuth.getInstance();
+        String userId = auth.getCurrentUser().getUid();
+
+        db.collection("users")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        List<String> purchaseIds = (List<String>) documentSnapshot.get("purchases");
+                        if (purchaseIds != null && !purchaseIds.isEmpty()) {
+                            // Prendi solo gli ultimi 5 ID in ordine inverso
+                            List<String> latestIds = purchaseIds.subList(Math.max(purchaseIds.size() - 5, 0), purchaseIds.size());
+                            Collections.reverse(latestIds); // Ordina dal più recente
+                            Log.e("FIREBASE", "trovati : " + latestIds.size());
+
+                            fetchPurchases(latestIds);
+                        }
+                    }
+                });
+
 
         return view;
     }
+    private void fetchPurchases(List<String> ids) {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        List<Purchase> purchases = new ArrayList<>();
+
+        for (String id : ids) {
+            db.collection("purchases").document(id)
+                    .get()
+                    .addOnSuccessListener(doc -> {
+                        Purchase p = doc.toObject(Purchase.class);
+                        if (p != null) {
+                            p.setId(doc.getId());  // aggiungi ID del documento
+                            purchases.add(p);
+                            Log.d("PurchaseAdapter", "ID: " + p.getId() + ", Date: " + p.getTimestamp() + ", Total: " + p.getTotal_price());
+
+                        }
+                        if (purchases.size() == ids.size()) {
+                            // tutti caricati → aggiorna adapter
+                            adapter = new PurchaseAdapter(purchases);
+                            recyclerView.setAdapter(adapter);
+                        }
+                    });
+        }
+    }
+
+
 }

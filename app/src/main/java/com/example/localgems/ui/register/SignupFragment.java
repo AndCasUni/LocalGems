@@ -1,6 +1,7 @@
 package com.example.localgems.ui.register;
 
 import android.app.DatePickerDialog;
+import android.content.Intent;
 import android.content.res.ColorStateList;
 import android.graphics.Color;
 import android.os.Bundle;
@@ -64,7 +65,7 @@ public class SignupFragment extends Fragment {
         // Setup del bottone usando la view appena inflata
         Button registerButton = view.findViewById(R.id.button_register);
         registerButton.setOnClickListener(v -> validateForm());
-        buttonLogin.setOnClickListener(v -> navToLogin(v));
+        buttonLogin.setOnClickListener(v -> validateForm());
         checkboxTerms.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 checkboxTerms.setButtonTintList(ColorStateList.valueOf(Color.WHITE));
@@ -213,22 +214,65 @@ public class SignupFragment extends Fragment {
     }
 
     private void registerUser() {
-        // TODO: Implmenting registration logic
-        Toast.makeText(requireContext(), "Registrazione completata!", Toast.LENGTH_SHORT).show();
+        String firstName = inputFirstName.getText().toString().trim();
+        String lastName = inputLastName.getText().toString().trim();
+        String birthDate = inputBirthDate.getText().toString().trim();
+        String email = inputEmail.getText().toString().trim();
+        String password = inputPassword.getText().toString().trim();
 
-        // Chiudi l'activity
-        if (getActivity() != null) {
-            getActivity().finish();
-        }
+        com.google.firebase.auth.FirebaseAuth.getInstance()
+                .createUserWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        String userId = com.google.firebase.auth.FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+                        // Costruisci l'oggetto user da salvare nel DB
+                        java.util.HashMap<String, Object> userData = new java.util.HashMap<>();
+                        userData.put("firstName", firstName);
+                        userData.put("lastName", lastName);
+                        userData.put("birthDate", birthDate);
+                        userData.put("email", email);
+                        userData.put("cart", new java.util.ArrayList<>()); // opzionale: inizializza carrello vuoto
+
+                        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                                .collection("users")
+                                .document(userId)
+                                .set(userData)
+                                .addOnSuccessListener(aVoid -> {
+                                    Toast.makeText(requireContext(), "Registrazione completata!", Toast.LENGTH_SHORT).show();
+
+                                    // Chiudi activity o passa al login
+                                    if (getActivity() != null) {
+                                        navToLogin(email, password);
+                                    }
+                                })
+                                .addOnFailureListener(e -> {
+                                    Toast.makeText(requireContext(), "Errore durante il salvataggio dati utente: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                                });
+
+                    } else {
+                        Toast.makeText(requireContext(), "Registrazione fallita: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
 
-    private void navToLogin(View view) {
-        // TODO: Implementing login logic
-        if (getActivity() != null) {
-            getActivity().getSupportFragmentManager().beginTransaction()
-                    .replace(R.id.fragment_container, new LoginFragment())
-                    .addToBackStack(null)
-                    .commit();
-        }
+
+    private void navToLogin(String email, String password) {
+        com.google.firebase.auth.FirebaseAuth.getInstance()
+                .signInWithEmailAndPassword(email, password)
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        // Login riuscito: apri la MainActivity
+                        if (getActivity() != null) {
+                            Intent intent = new Intent(getActivity(), com.example.localgems.MainActivity.class);
+                            intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK); // cancella lo stack
+                            startActivity(intent);
+                            getActivity().finish(); // chiude l'attuale activity (es: RegisterActivity)
+                        }
+                    } else {
+                        Toast.makeText(requireContext(), "Login fallito: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                    }
+                });
     }
+
 }

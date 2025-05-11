@@ -43,6 +43,7 @@ public class CartAdapter extends RecyclerView.Adapter<CartItemViewHolder> {
         int quantity = item.getQuantity();
         double totalPrice = unitPrice * quantity;
         holder.productName.setText(name);
+        holder.productDescription.setText(item.getProduct().getDescription());
         holder.rating.setText("(" + item.getProduct().getRating() + "★)");
         holder.productPrice.setText(String.format("€ %.2f x%d = € %.2f", unitPrice, quantity, totalPrice));
         holder.quantityText.setText(String.valueOf(quantity));

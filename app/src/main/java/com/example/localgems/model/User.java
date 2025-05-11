@@ -12,8 +12,6 @@ public class User {
 
   private String email;
 
-    private String[] purchases;
-
 
     public User(){}
 
@@ -23,14 +21,12 @@ public class User {
         this.first_name = first_name;
         this.last_name = last_name;
         this.birth_date = birth_date;
-        this.purchases = new String[0];
     }
 
     public String getId(){ return id;}
     public void setId(String id) {
         this.id = id;
     }
-    public String[] getPurchases() { return purchases;}
 
       public String getEmail() {
         return email;

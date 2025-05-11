@@ -48,14 +48,29 @@ public class AccountFragment extends Fragment {
         seeOrdersButton = view.findViewById(R.id.account_see_orders_button);
         logoutButton = view.findViewById(R.id.account_logout_button);
 
-        // Simulating a user object, normally fetched from backend or database
-        currentUser = new User("user@example.com", "Mario", "Rossi", "15/03/1990", "password123");
+        String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
 
-        // Set user details on screen
-        emailText.setText(currentUser.getEmail());
-        nameText.setText(currentUser.getFirstName());
-        lastNameText.setText(currentUser.getLastName());
-        birthDateText.setText(currentUser.getBirthDate());
+        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        currentUser = documentSnapshot.toObject(User.class);
+
+                        if (currentUser != null) {
+                            emailText.setText(currentUser.getEmail());
+                            nameText.setText(currentUser.getFirstName());
+                            lastNameText.setText(currentUser.getLastName());
+                            birthDateText.setText(currentUser.getBirthDate());
+                        }
+                    } else {
+                        Toast.makeText(getContext(), "Utente non trovato", Toast.LENGTH_SHORT).show();
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Toast.makeText(getContext(), "Errore nel recupero dati utente: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                });
 
         // Handle password change button click
         seeOrdersButton.setOnClickListener(v -> showOrdersFragment());

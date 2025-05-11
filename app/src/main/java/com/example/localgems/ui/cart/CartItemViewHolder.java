@@ -13,7 +13,7 @@ import com.example.localgems.R;
 public class CartItemViewHolder extends RecyclerView.ViewHolder {
 
     public ImageView productImage;
-    public TextView productName, productPrice, quantityText, rating;
+    public TextView productName, productPrice, quantityText, rating, productDescription;
     public Button btnDecrease, btnIncrease, btnDelete;
 
     public CartItemViewHolder(@NonNull View itemView) {
@@ -21,6 +21,8 @@ public class CartItemViewHolder extends RecyclerView.ViewHolder {
 
         productImage = itemView.findViewById(R.id.product_image);
         productName = itemView.findViewById(R.id.product_name);
+        productDescription = itemView.findViewById(R.id.product_description);
+
         rating =  itemView.findViewById(R.id.item_product_seller_name);
         productPrice = itemView.findViewById(R.id.product_price);
         quantityText = itemView.findViewById(R.id.quantity_text);

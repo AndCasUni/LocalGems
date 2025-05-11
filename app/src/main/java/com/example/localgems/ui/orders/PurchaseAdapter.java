@@ -1,5 +1,6 @@
 package com.example.localgems.ui.orders;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
     @Override
     public void onBindViewHolder(@NonNull PurchaseViewHolder holder, int position) {
         Purchase purchase = purchases.get(position);
+
         holder.bind(purchase);
     }
 
@@ -43,21 +45,19 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
         private final TextView orderId;
         private final TextView orderDate;
         private final TextView orderTotal;
-        private final TextView orderUser;
 
         public PurchaseViewHolder(@NonNull View itemView) {
             super(itemView);
             orderId = itemView.findViewById(R.id.order_id);
             orderDate = itemView.findViewById(R.id.order_date);
             orderTotal = itemView.findViewById(R.id.order_total);
-            orderUser = itemView.findViewById(R.id.order_user);
         }
 
         public void bind(Purchase purchase) {
-            orderId.setText("Ordine #" + purchase.getId());
-            orderDate.setText("Data: " + purchase.getDate());
-            orderTotal.setText(String.format("Totale: €%.2f", purchase.getTotalPrice()));
-            orderUser.setText("Utente: " + purchase.getUser_id());
+            orderId.setText("Ordine #" + purchase.getId().substring(5));
+            orderDate.setText("Data: " + purchase.getTimestamp());
+            orderTotal.setText(String.format("Totale: €%.2f", purchase.getTotal_price()));
         }
+
     }
 }
