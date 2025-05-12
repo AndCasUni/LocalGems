@@ -1,41 +1,54 @@
 package com.example.localgems.model;
 
+import java.sql.Timestamp;
+import java.util.Date;
+
 public class Review {
-    private String author;
-    private String content;
-    private String stars;
+    private String utente;
+    private String descrizione;
+    private Long valutazione;
+    private Date ora;
 
     public Review() {
         // Costruttore vuoto richiesto da Firestore
     }
 
-    public Review(String author, String content, String stars) {
-        this.author = author != null ? author : "Anonimo";
-        this.content = content != null ? content : "Nessun contenuto";
-        this.stars = stars != null ? stars : "0";
+    public Review(String utente, String descrizione, String valutazione, String ora) {
+        this.utente = utente != null ? utente : "Anonimo";
+        this.descrizione = descrizione != null ? descrizione : "Nessun contenuto";
+        this.valutazione = valutazione != null ? Long.parseLong(valutazione) : 0;
+        this.ora = ora != null ? Timestamp.valueOf(ora) : new Timestamp(System.currentTimeMillis());
     }
 
-    public String getAuthor() {
-        return author;
+    public String getUtente() {
+        return utente;
     }
 
-    public void setAuthor(String author) {
-        this.author = author;
+    public void setUtente(String utente) {
+        this.utente = utente;
     }
 
-    public String getContent() {
-        return content;
+    public String getDescrizione() {
+        return descrizione;
     }
 
-    public void setContent(String content) {
-        this.content = content;
+    public void setDescrizione(String descrizione) {
+        this.descrizione = descrizione;
     }
 
-    public String getStars() {
-        return stars;
+    public Long getValutazione() {
+        return valutazione;
     }
 
-    public void setStars(String stars) {
-        this.stars = stars;
+    public void setValutazione(Long valutazione) {
+        this.valutazione = valutazione;
+    }
+
+    public Date getOra() {
+        return ora;
+    }
+
+    public void setOra(Date ora) {
+        this.ora = ora;
     }
 }
