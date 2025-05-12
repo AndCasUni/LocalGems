@@ -21,9 +21,12 @@ import com.example.localgems.R;
 
 import com.example.localgems.model.Product;
 import com.example.localgems.model.Review;
+import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -65,10 +68,10 @@ public class ProductDetailFragment extends Fragment {
         addToCartButton = root.findViewById(R.id.add_to_cart_button);
         quantityPlusButton = root.findViewById(R.id.quantity_plus_button);
         quantityMinusButton = root.findViewById(R.id.quantity_minus_button);
-        reviewsRecyclerView = root.findViewById(R.id.reviews_recycler_view);
+        RecyclerView recyclerView = root.findViewById(R.id.reviews_recycler_view);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         reviewsAdapter = new ReviewsAdapter(reviewsList, getContext());
-        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        reviewsRecyclerView.setAdapter(reviewsAdapter);
+        recyclerView.setAdapter(reviewsAdapter);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user != null;
@@ -168,18 +171,44 @@ public class ProductDetailFragment extends Fragment {
                     })
                     .addOnFailureListener(e -> Log.e("DETAILS", "Errore nel recupero del prodotto", e));
 
-            // Recupero delle recensioni
-            FirebaseFirestore.getInstance()
-                    .collection("products")
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("products")
                     .document(productId)
                     .collection("reviews")
+                    .orderBy("descrizione", Query.Direction.DESCENDING) // Ordine alfabetico inverso
+                    .limit(5) // Solo le ultime 5
                     .get()
                     .addOnSuccessListener(queryDocumentSnapshots -> {
                         reviewsList.clear();
-                        reviewsList.addAll(queryDocumentSnapshots.toObjects(Review.class));
+
+                        for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                            Review review = new Review();
+
+                            review.setDescrizione(doc.getString("descrizione"));
+                            review.setUtente(doc.getString("utente"));
+
+                            Long valuationLong = doc.getLong("valutazione");
+                            int valuation = (valuationLong != null) ? valuationLong.intValue() : 0;
+                            review.setValutazione(valuation);
+
+                            Timestamp timestamp = doc.getTimestamp("ora");
+                            if (timestamp != null) {
+                                review.setOra(timestamp.toDate());
+                            }
+
+                            reviewsList.add(review);
+
+                            Log.d("REVIEW_DEBUG", "Recuperata: " +
+                                    review.getDescrizione() + ", " +
+                                    review.getUtente() + ", " +
+                                    review.getValutazione() + ", " +
+                                    review.getOra());
+                        }
+
                         reviewsAdapter.notifyDataSetChanged();
                     })
                     .addOnFailureListener(e -> Log.e("DETAILS", "Errore nel recupero delle recensioni", e));
+
         }
 
         return root;
