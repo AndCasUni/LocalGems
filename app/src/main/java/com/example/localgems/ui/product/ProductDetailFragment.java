@@ -13,16 +13,21 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
 import com.example.localgems.R;
 
 import com.example.localgems.model.Product;
+import com.example.localgems.model.Review;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ProductDetailFragment extends Fragment {
@@ -36,6 +41,9 @@ public class ProductDetailFragment extends Fragment {
     private Button addToCartButton;
     private Button quantityPlusButton;
     private Button quantityMinusButton;
+    private RecyclerView reviewsRecyclerView;
+    private ReviewsAdapter reviewsAdapter;
+    private List<Review> reviewsList = new ArrayList<>();
 
     private int quantity = 1;
     double rating = 0;
@@ -57,7 +65,10 @@ public class ProductDetailFragment extends Fragment {
         addToCartButton = root.findViewById(R.id.add_to_cart_button);
         quantityPlusButton = root.findViewById(R.id.quantity_plus_button);
         quantityMinusButton = root.findViewById(R.id.quantity_minus_button);
-
+        reviewsRecyclerView = root.findViewById(R.id.reviews_recycler_view);
+        reviewsAdapter = new ReviewsAdapter(reviewsList, getContext());
+        reviewsRecyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        reviewsRecyclerView.setAdapter(reviewsAdapter);
 
         FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
         assert user != null;
@@ -156,9 +167,20 @@ public class ProductDetailFragment extends Fragment {
                         }
                     })
                     .addOnFailureListener(e -> Log.e("DETAILS", "Errore nel recupero del prodotto", e));
+
+            // Recupero delle recensioni
+            FirebaseFirestore.getInstance()
+                    .collection("products")
+                    .document(productId)
+                    .collection("reviews")
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        reviewsList.clear();
+                        reviewsList.addAll(queryDocumentSnapshots.toObjects(Review.class));
+                        reviewsAdapter.notifyDataSetChanged();
+                    })
+                    .addOnFailureListener(e -> Log.e("DETAILS", "Errore nel recupero delle recensioni", e));
         }
-
-
 
         return root;
     }
