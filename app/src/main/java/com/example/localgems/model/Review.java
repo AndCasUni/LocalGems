@@ -11,12 +11,14 @@ public class Review {
     // Costruttore vuoto richiesto da Firestore
     public Review() {}
 
+
     // Costruttore opzionale per comodità
     public Review(String description, String user, int valuation, Date date) {
         this.descrizione = description;
         this.utente = user;
         this.valutazione = valuation;
         this.ora = date;
+
     }
     public String getUtente() {
         return utente;
