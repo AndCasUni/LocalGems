@@ -1,6 +1,7 @@
 package com.example.localgems.ui.order;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,9 +21,13 @@ import com.example.localgems.model.Product;
 import com.example.localgems.model.Purchase;
 import com.example.localgems.model.Review;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 
 public class OrderFragment extends Fragment {
@@ -39,8 +44,10 @@ public class OrderFragment extends Fragment {
         View view = inflater.inflate(R.layout.fragment_order, container, false);
         db = FirebaseFirestore.getInstance();
 
+
         // Recupera l'ID dell'ordine passato come argomento
         String orderId = getArguments() != null ? getArguments().getString("orderId") : null;
+
         if (orderId != null) {
             db.collection("purchases").document(orderId)
                     .get()
@@ -60,12 +67,34 @@ public class OrderFragment extends Fragment {
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
 
-        // Esempi artificiali di prodotti
-        List<Product> products = Arrays.asList(
-                new Product("Prodotto 1", "Descrizione prodotto 1", 9.99),
-                new Product("Prodotto 2", "Descrizione prodotto 2", 19.99),
-                new Product("Prodotto 3", "Descrizione prodotto 3", 29.99)
-        );
+        List<Product> products = new ArrayList<>();
+        adapter = new ProductsAdapterOrder(products);
+        recyclerView.setAdapter(adapter);
+
+        db.collection("purchases")
+                .document(orderId)
+                .collection("productsPurchased")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    for (DocumentSnapshot doc : queryDocumentSnapshots) {
+                        String productId = doc.getId(); // Ogni documento rappresenta un prodotto acquistato
+
+                        db.collection("products")
+                                .document(productId)
+                                .get()
+                                .addOnSuccessListener(productDoc -> {
+                                    Product product = productDoc.toObject(Product.class);
+                                    if (product != null) {
+                                        product.setId(productDoc.getId());
+                                        products.add(product);
+                                        adapter.notifyDataSetChanged(); // aggiorna ogni volta
+                                    }
+                                });
+                    }
+                })
+                .addOnFailureListener(e -> {
+                    Log.e("ORDER_FRAGMENT", "Errore nel recupero dei prodotti acquistati", e);
+                });
 
         adapter = new ProductsAdapterOrder(products); // Nascondi i pulsanti
         recyclerView.setAdapter(adapter);
@@ -92,26 +121,66 @@ public class OrderFragment extends Fragment {
 
         // Pubblica recensione
         publishReviewButton.setOnClickListener(v -> {
+
+            Log.d("REVIEW", "Pulsante pubblica premuto!");
+
             String reviewText = reviewInput.getText().toString().trim();
-            Long rating = (long) ratingBar.getRating();
+            int ratingValue = (int) ratingBar.getRating();
+            String userId = FirebaseAuth.getInstance().getCurrentUser().getUid(); // Se usi Auth
 
-            if (!reviewText.isEmpty() && rating > 0 && orderId != null) {
-                Review review = new Review(orderId, reviewText, rating, System.currentTimeMillis());
 
-                db.collection("reviews")
-                        .add(review)
-                        .addOnSuccessListener(docRef -> {
+            if (!reviewText.isEmpty() && ratingValue > 0 && orderId != null) {
+                db.collection("purchases")
+                        .document(orderId)
+                        .collection("productsPurchased")
+                        .get()
+                        .addOnSuccessListener(querySnapshot -> {
+                            for (DocumentSnapshot doc : querySnapshot) {
+                                String productId = doc.getId(); // se il documentId è l'id del prodotto
+                                Review review = new Review(reviewText, userId, ratingValue,new Date());
+
+                                db.collection("products")
+                                        .document(productId)
+                                        .collection("reviews")
+                                        .add(review)
+                                        .addOnSuccessListener(reviewDoc -> {
+                                            // aggiornamento rating
+                                            db.collection("products")
+                                                    .document(productId)
+                                                    .collection("reviews")
+                                                    .get()
+                                                    .addOnSuccessListener(snapshot -> {
+                                                        int totalRating = 0;
+                                                        int count = 0;
+
+                                                        for (DocumentSnapshot rDoc : snapshot.getDocuments()) {
+                                                            Long r = rDoc.getLong("valutazione");
+                                                            if (r != null) {
+                                                                totalRating += r.intValue();
+                                                                count++;
+                                                            }
+                                                        }
+
+                                                        if (count > 0) {
+                                                            double average = Math.round(((double) totalRating / count) * 100.0) / 100.0;
+                                                            db.collection("products")
+                                                                    .document(productId)
+                                                                    .update("rating", average);
+                                                        }
+                                                    });
+                                        });
+                            }
+
                             Toast.makeText(getContext(), "Recensione inviata!", Toast.LENGTH_SHORT).show();
                             reviewWidget.setVisibility(View.GONE);
                             reviewInput.setText("");
                             ratingBar.setRating(0);
-                        })
-                        .addOnFailureListener(e -> {
-                            Toast.makeText(getContext(), "Errore durante l'invio", Toast.LENGTH_SHORT).show();
                         });
+
             } else {
                 Toast.makeText(getContext(), "Inserisci testo e una valutazione", Toast.LENGTH_SHORT).show();
             }
+
         });
 
         return view;

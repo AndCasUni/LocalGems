@@ -14,6 +14,7 @@ import androidx.navigation.Navigation;
 import com.example.localgems.R;
 import com.example.localgems.model.Purchase;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder> {
@@ -21,7 +22,7 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
     private final List<Purchase> purchases;
 
     public PurchaseAdapter(List<Purchase> purchases) {
-        this.purchases = purchases;
+        this.purchases = (purchases != null) ? purchases : new ArrayList<Purchase>();
     }
 
     @NonNull

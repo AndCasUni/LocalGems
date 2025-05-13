@@ -64,7 +64,10 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:background="#80000000"
-        android:visibility="gone">
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="10dp"> <!-- AGGIUNTO -->
 
         <LinearLayout
             android:layout_width="match_parent"
