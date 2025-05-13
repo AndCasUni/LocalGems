@@ -1,25 +1,25 @@
 package com.example.localgems.model;
 
-import java.sql.Timestamp;
 import java.util.Date;
 
 public class Review {
-    private String utente;
     private String descrizione;
-    private Long valutazione;
+    private String utente;
+    private int valutazione;
     private Date ora;
 
-    public Review() {
-        // Costruttore vuoto richiesto da Firestore
-    }
+    // Costruttore vuoto richiesto da Firestore
+    public Review() {}
 
-    public Review(String utente, String descrizione, Long valutazione, Long ora) {
-        this.utente = utente != null ? utente : "Anonimo";
-        this.descrizione = descrizione != null ? descrizione : "Nessun contenuto";
-        this.valutazione = valutazione != null ? valutazione : 0;
-        this.ora = ora != null ? new Timestamp(ora) : new Timestamp(System.currentTimeMillis());
-    }
 
+    // Costruttore opzionale per comodità
+    public Review(String description, String user, int valuation, Date date) {
+        this.descrizione = description;
+        this.utente = user;
+        this.valutazione = valuation;
+        this.ora = date;
+
+    }
     public String getUtente() {
         return utente;
     }
@@ -36,11 +36,11 @@ public class Review {
         this.descrizione = descrizione;
     }
 
-    public Long getValutazione() {
+    public int getValutazione() {
         return valutazione;
     }
 
-    public void setValutazione(Long valutazione) {
+    public void setValutazione(int valutazione) {
         this.valutazione = valutazione;
     }
 

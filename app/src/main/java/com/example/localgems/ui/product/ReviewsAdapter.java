@@ -12,21 +12,19 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.localgems.R;
 import com.example.localgems.model.Review;
+import com.google.firebase.firestore.FirebaseFirestore;
 
-
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHolder> {
 
     private final List<Review> reviews;
-    private Context context;
+    private final Context context;
 
     // Costruttore
-    public ReviewsAdapter(List<Review> products) {
-        this.reviews = products;
-    }
-
     public ReviewsAdapter(List<Review> reviewList, Context context) {
         this.context = context;
         this.reviews = (reviewList != null) ? reviewList : new ArrayList<>();
@@ -35,7 +33,6 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Inflazione del layout dell'elemento
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_review, parent, false);
         return new ViewHolder(view);
     }
@@ -43,45 +40,66 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
         Review review = reviews.get(position);
-        Log.d("ADAPTER", "Bind della recensione: " + review.getDescrizione());
 
-        // Dobbiamo prendere il nome dell'autore dalla raccolta degli utenti, associando l'ID
+        // Recupera autore dal campo "user" (user ID)
         String authorID = review.getUtente();
-        // Qui dovresti implementare la logica per ottenere il nome dell'autore dall'ID
-        // usa firebase
-        // chatty fai qualcosa non voglio usare un esempio voglio proprio scrivere il codice
-
-
-
-        // Impostazione della valutazione
-        String starsString = "";
-        for (int i = 0; i < review.getValutazione(); i++) {
-            starsString += "★";
+        if (authorID != null && !authorID.isEmpty()) {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
+            db.collection("users").document(authorID)
+                    .get()
+                    .addOnSuccessListener(documentSnapshot -> {
+                        if (documentSnapshot.exists()) {
+                            String name = documentSnapshot.getString("firstName");
+                            String surname = documentSnapshot.getString("lastName");
+                            holder.authorTextView.setText(name + " " + surname);
+                        } else {
+                            holder.authorTextView.setText("Utente sconosciuto");
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        holder.authorTextView.setText("Errore caricamento autore");
+                        Log.e("USER_INFO", "Errore nel recupero utente", e);
+                    });
+        } else {
+            holder.authorTextView.setText("Utente non disponibile");
         }
-        for (int i = Math.toIntExact(review.getValutazione()); i < 5; i++) {
-            starsString += "☆";
+
+        // Format data
+        if (review.getOra() != null) {
+            SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy", Locale.getDefault());
+            holder.date.setText(sdf.format(review.getOra()));
+        } else {
+            holder.date.setText("Data non disponibile");
         }
 
-        holder.starsTextView.setText(starsString);
+        // Stelle
+        int stars = review.getValutazione();
+        Log.e("USER_INFO", "STELLE " + stars);
 
+        StringBuilder starsString = new StringBuilder();
+        for (int i = 0; i < stars; i++) starsString.append("★");
+        for (int i = stars; i < 5; i++) starsString.append("☆");
+        holder.starsTextView.setText(starsString.toString());
+
+        // Contenuto recensione
         holder.contentTextView.setText(review.getDescrizione());
     }
 
     @Override
     public int getItemCount() {
-        return (reviews != null) ? reviews.size() : 0;
+        return reviews.size();
     }
 
-    // ViewHolder: definisce gli elementi visivi di ogni item
+    // ViewHolder
     public static class ViewHolder extends RecyclerView.ViewHolder {
-
-        TextView authorTextView, starsTextView, contentTextView;
+        TextView authorTextView, starsTextView, contentTextView, date;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             authorTextView = itemView.findViewById(R.id.review_author);
             starsTextView = itemView.findViewById(R.id.review_stars);
             contentTextView = itemView.findViewById(R.id.review_content);
+            date = itemView.findViewById(R.id.review_date);
         }
     }
 }
