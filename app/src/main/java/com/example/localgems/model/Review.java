@@ -13,11 +13,11 @@ public class Review {
         // Costruttore vuoto richiesto da Firestore
     }
 
-    public Review(String utente, String descrizione, String valutazione, String ora) {
+    public Review(String utente, String descrizione, Long valutazione, Long ora) {
         this.utente = utente != null ? utente : "Anonimo";
         this.descrizione = descrizione != null ? descrizione : "Nessun contenuto";
-        this.valutazione = valutazione != null ? Long.parseLong(valutazione) : 0;
-        this.ora = ora != null ? Timestamp.valueOf(ora) : new Timestamp(System.currentTimeMillis());
+        this.valutazione = valutazione != null ? valutazione : 0;
+        this.ora = ora != null ? new Timestamp(ora) : new Timestamp(System.currentTimeMillis());
     }
 
     public String getUtente() {

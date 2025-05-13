@@ -39,5 +39,15 @@
         android:id="@+id/nav_orders"
         android:name="com.example.localgems.ui.orders.OrdersFragment"
         android:label="Orders"
-        tools:layout="@layout/fragment_orders" />
+        tools:layout="@layout/fragment_orders">
+        <action
+            android:id="@+id/action_nav_orders_to_nav_order"
+            app:destination="@id/nav_order" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/nav_order"
+        android:name="com.example.localgems.ui.order.OrderFragment"
+        android:label="Order Details"
+        tools:layout="@layout/fragment_order" />
 </navigation>

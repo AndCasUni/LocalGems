@@ -1,12 +1,15 @@
 package com.example.localgems.ui.orders;
 
+import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.Navigation;
 
 import com.example.localgems.R;
 import com.example.localgems.model.Purchase;
@@ -32,7 +35,6 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
     @Override
     public void onBindViewHolder(@NonNull PurchaseViewHolder holder, int position) {
         Purchase purchase = purchases.get(position);
-
         holder.bind(purchase);
     }
 
@@ -57,7 +59,12 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
             orderId.setText("Ordine #" + purchase.getId().substring(5));
             orderDate.setText("Data: " + purchase.getTimestamp());
             orderTotal.setText(String.format("Totale: €%.2f", purchase.getTotal_price()));
-        }
 
+            itemView.setOnClickListener(v -> {
+                Bundle bundle = new Bundle();
+                bundle.putString("orderId", purchase.getId());
+                Navigation.findNavController(v).navigate(R.id.action_nav_orders_to_nav_order, bundle);
+            });
+        }
     }
 }

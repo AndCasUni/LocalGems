@@ -10,6 +10,12 @@ public class Purchase {
 
     public Purchase() {}
 
+    public Purchase(String id, Date timestamp, double total_price) {
+        this.id = id;
+        this.timestamp = timestamp;
+        this.total_price = total_price;
+    }
+
     public String getUser_id() { return user_id; }
     public void setUser_id(String user_id) { this.user_id = user_id; }
 

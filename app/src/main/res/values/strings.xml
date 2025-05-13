@@ -63,4 +63,16 @@
     <string name="loading_reviews">Cargando reseñas...</string>
     <string name="no_reviews">No hay reseñas disponibles.</string>
     <string name="error_loading_reviews">Error al cargar las reseñas.</string>
+
+    <!-- Testi per ordine -->
+    <string name="order_id">ID Ordine: %1$s</string>
+    <string name="order_date">Data: %1$s</string>
+    <string name="order_total">Totale: %1$s</string>
+    <string name="order_user">Utente: %1$s</string>
+    <string name="order_review_button">Escribe una reseña</string>
+
+    <!-- Prompt e pulsante in spagnolo -->
+    <string name="review_prompt">Escribe tu reseña aquí...</string>
+    <string name="review_publish_button">Publicar</string>
+
 </resources>
