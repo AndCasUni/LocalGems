@@ -5,6 +5,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
@@ -30,6 +31,7 @@ public class OrdersFragment extends Fragment {
 
     private RecyclerView recyclerView;
     private PurchaseAdapter adapter;
+    private TextView noOrdersText; // Aggiungi un TextView per il messaggio "Nessun ordine effettuato"
 
     @Nullable
     @Override
@@ -44,6 +46,9 @@ public class OrdersFragment extends Fragment {
 
         adapter = new PurchaseAdapter(new ArrayList<>());
         recyclerView.setAdapter(adapter);
+
+        noOrdersText = view.findViewById(R.id.no_orders_text); // Inizializza il TextView
+        noOrdersText.setVisibility(View.GONE); // Nascondi il messaggio inizialmente
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
         FirebaseAuth auth = FirebaseAuth.getInstance();
@@ -65,10 +70,12 @@ public class OrdersFragment extends Fragment {
                         } else {
                             // Usa ordini finti se non ci sono ordini reali
                             useFakeOrders();
+                            noOrdersText.setVisibility(View.VISIBLE); // Mostra il messaggio se non ci sono ordini
                         }
                     } else {
                         // Usa ordini finti se il documento non esiste
                         useFakeOrders();
+                        noOrdersText.setVisibility(View.VISIBLE); // Mostra il messaggio se il documento non esiste
                     }
                 });
 

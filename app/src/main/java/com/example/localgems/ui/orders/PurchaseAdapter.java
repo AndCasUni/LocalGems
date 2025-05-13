@@ -14,6 +14,8 @@ import androidx.navigation.Navigation;
 import com.example.localgems.R;
 import com.example.localgems.model.Purchase;
 
+import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.List;
 
 public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.PurchaseViewHolder> {
@@ -56,9 +58,14 @@ public class PurchaseAdapter extends RecyclerView.Adapter<PurchaseAdapter.Purcha
         }
 
         public void bind(Purchase purchase) {
-            orderId.setText("Ordine #" + purchase.getId().substring(5));
-            orderDate.setText("Data: " + purchase.getTimestamp());
-            orderTotal.setText(String.format("Totale: €%.2f", purchase.getTotal_price()));
+            orderId.setText(itemView.getContext().getString(R.string.order_id, purchase.getId().substring(5)));
+
+            // Formatta il timestamp in formato "Weekday DD/MM/YYYY" in spagnolo
+            SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", new Locale("es", "ES"));
+            String formattedDate = dateFormat.format(purchase.getTimestamp());
+            orderDate.setText(itemView.getContext().getString(R.string.order_date, formattedDate));
+
+            orderTotal.setText(itemView.getContext().getString(R.string.order_total, String.format(Locale.getDefault(), "%.2f", purchase.getTotal_price())));
 
             itemView.setOnClickListener(v -> {
                 Bundle bundle = new Bundle();

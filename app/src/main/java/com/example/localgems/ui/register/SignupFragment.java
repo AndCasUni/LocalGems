@@ -65,7 +65,7 @@ public class SignupFragment extends Fragment {
         // Setup del bottone usando la view appena inflata
         Button registerButton = view.findViewById(R.id.button_register);
         registerButton.setOnClickListener(v -> validateForm());
-        buttonLogin.setOnClickListener(v -> validateForm());
+        buttonLogin.setOnClickListener(v -> navToLoginScreen());
         checkboxTerms.setOnCheckedChangeListener((buttonView, isChecked) -> {
             if (isChecked) {
                 checkboxTerms.setButtonTintList(ColorStateList.valueOf(Color.WHITE));
@@ -241,9 +241,9 @@ public class SignupFragment extends Fragment {
                                 .addOnSuccessListener(aVoid -> {
                                     Toast.makeText(requireContext(), "Registrazione completata!", Toast.LENGTH_SHORT).show();
 
-                                    // Chiudi activity o passa al login
+                                    // Chiama il metodo per effettuare il login
                                     if (getActivity() != null) {
-                                        navToLogin(email, password);
+                                        performLoginAfterRegistration(email, password);
                                     }
                                 })
                                 .addOnFailureListener(e -> {
@@ -256,8 +256,15 @@ public class SignupFragment extends Fragment {
                 });
     }
 
+    private void navToLoginScreen() {
+        // Torna alla schermata di login
+        requireActivity().getSupportFragmentManager().beginTransaction()
+                .replace(R.id.fragment_container, new LoginFragment())
+                .addToBackStack(null)
+                .commit();
+    }
 
-    private void navToLogin(String email, String password) {
+    private void performLoginAfterRegistration(String email, String password) {
         com.google.firebase.auth.FirebaseAuth.getInstance()
                 .signInWithEmailAndPassword(email, password)
                 .addOnCompleteListener(task -> {

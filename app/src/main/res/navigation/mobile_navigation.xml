@@ -18,6 +18,12 @@
         tools:layout="@layout/fragment_product_detail" />
 
     <fragment
+        android:id="@+id/nav_product_detail_order"
+        android:name="com.example.localgems.ui.order.OrderProductDetail"
+        android:label="Product Detail Order"
+        tools:layout="@layout/fragment_product_detail_order" />
+
+    <fragment
         android:id="@+id/nav_search"
         android:name="com.example.localgems.ui.search.SearchFragment"
         android:label="@string/menu_search"

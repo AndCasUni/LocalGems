@@ -235,7 +235,7 @@ public class CartFragment extends Fragment {
         for (CartItem item : cartItems) {
             total += item.getProduct().getPrice() * item.getQuantity();
         }
-        String text = String.format("Compra ora (€ %.2f)", total);
+        String text = getString(R.string.buy_now_button, String.format("%.2f", total));
         buyNowButton.setText(text);
     }
 }

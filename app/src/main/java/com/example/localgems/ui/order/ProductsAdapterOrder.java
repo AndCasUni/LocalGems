@@ -1,5 +1,6 @@
 package com.example.localgems.ui.order;
 
+import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -8,9 +9,11 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.navigation.Navigation;
 
 import com.example.localgems.R;
 import com.example.localgems.model.Product;
+import com.bumptech.glide.Glide; // Import aggiunto per Glide
 
 import java.util.List;
 
@@ -34,6 +37,16 @@ public class ProductsAdapterOrder extends RecyclerView.Adapter<ProductsAdapterOr
     public void onBindViewHolder(@NonNull ProductViewHolder holder, int position) {
         Product product = products.get(position);
         holder.bind(product);
+
+        // Gestione click sull'elemento
+        holder.itemView.setOnClickListener(v -> {
+            Bundle bundle = new Bundle();
+            bundle.putString("productName", product.getName());
+            bundle.putString("productDescription", product.getDescription());
+            bundle.putDouble("productPrice", product.getPrice());
+            bundle.putString("productImageUrl", product.getImage_url()); // Aggiunto
+            Navigation.findNavController(v).navigate(R.id.nav_product_detail_order, bundle);
+        });
     }
 
     @Override
@@ -69,10 +82,14 @@ public class ProductsAdapterOrder extends RecyclerView.Adapter<ProductsAdapterOr
             productName.setText(product.getName());
             productDescription.setText(product.getDescription());
             productPrice.setText(String.format("€ %.2f", product.getPrice()));
-            sellerName.setText("Venditore Sconosciuto"); // oppure product.getSeller()
+            sellerName.setText("");
 
-            // Placeholder immagine
-            productImage.setImageResource(R.drawable.placeholder_product);
+            // Carica immagine prodotto con Glide
+            Glide.with(itemView.getContext())
+                .load(product.getImage_url())
+                .placeholder(R.drawable.placeholder_product) // Immagine di placeholder
+                .error(R.drawable.placeholder_product) // Immagine di fallback in caso di errore
+                .into(productImage);
 
             // Nascondi i pulsanti
             btnDecrease.setVisibility(View.GONE);
