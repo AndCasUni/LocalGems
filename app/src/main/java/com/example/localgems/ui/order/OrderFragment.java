@@ -21,14 +21,20 @@ import com.example.localgems.model.Product;
 import com.example.localgems.model.Purchase;
 import com.example.localgems.model.Review;
 import com.google.android.material.button.MaterialButton;
+
+
+import java.text.SimpleDateFormat;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class OrderFragment extends Fragment {
 
@@ -55,9 +61,37 @@ public class OrderFragment extends Fragment {
                         Purchase purchase = doc.toObject(Purchase.class);
                         if (purchase != null) {
                             purchase.setId(doc.getId());
-                            ((TextView) view.findViewById(R.id.order_id)).setText("Ordine #" + purchase.getId().substring(5));
-                            ((TextView) view.findViewById(R.id.order_date)).setText("Data: " + purchase.getTimestamp());
-                            ((TextView) view.findViewById(R.id.order_total)).setText(String.format("Totale: €%.2f", purchase.getTotal_price()));
+                            ((TextView) view.findViewById(R.id.order_id)).setText(getString(R.string.order_id, purchase.getId().substring(5)));
+
+                            // Formatta il timestamp in formato "Weekday DD/MM/YYYY" in spagnolo
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("EEEE dd/MM/yyyy", new Locale("es", "ES"));
+                            String formattedDate = dateFormat.format(purchase.getTimestamp());
+                            ((TextView) view.findViewById(R.id.order_date)).setText(getString(R.string.order_date, formattedDate));
+
+                            ((TextView) view.findViewById(R.id.order_total)).setText(getString(R.string.order_total, String.format(Locale.getDefault(), "%.2f", purchase.getTotal_price())));
+
+                            // Recupera i prodotti dalla sottocollezione productsPurchased
+                            db.collection("purchases").document(orderId).collection("productsPurchased")
+                                    .get()
+                                    .addOnSuccessListener(querySnapshot -> {
+                                        List<Product> products = new ArrayList<>();
+                                        for (DocumentSnapshot productDoc : querySnapshot) {
+                                            Product product = new Product();
+                                            product.setName(productDoc.getString("name"));
+                                            product.setPrice(productDoc.getDouble("price"));
+                                            product.setDescription(""); // Descrizione non presente
+                                            product.setImage_url(productDoc.getString("image_url"));
+                                            product.setQuantity(productDoc.getLong("quantity").intValue());
+                                            products.add(product);
+                                        }
+
+                                        // Imposta l'adapter con i prodotti recuperati
+                                        adapter = new ProductsAdapterOrder(products);
+                                        recyclerView.setAdapter(adapter);
+                                    })
+                                    .addOnFailureListener(e -> {
+                                        Toast.makeText(getContext(), "Errore nel recupero dei prodotti.", Toast.LENGTH_SHORT).show();
+                                    });
                         }
                     });
         }
@@ -66,6 +100,7 @@ public class OrderFragment extends Fragment {
         recyclerView = view.findViewById(R.id.recycler_order_products);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
         recyclerView.setHasFixedSize(true);
+
 
         List<Product> products = new ArrayList<>();
         adapter = new ProductsAdapterOrder(products);

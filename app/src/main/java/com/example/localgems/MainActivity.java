@@ -3,6 +3,7 @@ package com.example.localgems;
 import android.os.Bundle;
 import android.view.View;
 import android.view.Menu;
+import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
@@ -20,6 +21,7 @@ import android.content.Intent;
 import androidx.annotation.Nullable;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.firestore.FirebaseFirestore;
 import com.example.localgems.LoginActivity;
 
 public class MainActivity extends AppCompatActivity {
@@ -60,6 +62,31 @@ public class MainActivity extends AppCompatActivity {
         NavController navController = Navigation.findNavController(this, R.id.nav_host_fragment_content_main);
         NavigationUI.setupActionBarWithNavController(this, navController, mAppBarConfiguration);
         NavigationUI.setupWithNavController(navigationView, navController);
+
+        // Recupera il nome, cognome ed email dell'utente
+        String uid = currentUser.getUid();
+        FirebaseFirestore.getInstance()
+            .collection("users")
+            .document(uid)
+            .get()
+            .addOnSuccessListener(documentSnapshot -> {
+                if (documentSnapshot.exists()) {
+                    String firstName = documentSnapshot.getString("firstName");
+                    String lastName = documentSnapshot.getString("lastName");
+                    String email = documentSnapshot.getString("email");
+
+                    // Imposta i valori nel nav_header_main
+                    View headerView = navigationView.getHeaderView(0);
+                    TextView nameTextView = headerView.findViewById(R.id.nav_header_name);
+                    TextView emailTextView = headerView.findViewById(R.id.nav_header_email);
+
+                    nameTextView.setText(firstName + " " + lastName);
+                    emailTextView.setText(email);
+                }
+            })
+            .addOnFailureListener(e -> {
+                // Gestisci eventuali errori
+            });
     }
 
 

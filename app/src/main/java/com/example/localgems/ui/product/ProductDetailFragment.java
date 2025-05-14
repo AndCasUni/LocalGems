@@ -65,7 +65,7 @@ public class ProductDetailFragment extends Fragment {
         productDescription = root.findViewById(R.id.product_description);
         productPrice = root.findViewById(R.id.product_price);
         quantityText = root.findViewById(R.id.quantity_text);
-        addToCartButton = root.findViewById(R.id.add_to_cart_button);
+        addToCartButton = root.findViewById(R.id.review_button);
         quantityPlusButton = root.findViewById(R.id.quantity_plus_button);
         quantityMinusButton = root.findViewById(R.id.quantity_minus_button);
         RecyclerView recyclerView = root.findViewById(R.id.reviews_recycler_view);
