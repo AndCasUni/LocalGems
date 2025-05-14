@@ -54,6 +54,12 @@ public class SearchProductsAdapter extends RecyclerView.Adapter<SearchProductsAd
         return products.size();
     }
 
+    public void updateProducts(List<Product> newProducts) {
+        products.clear();
+        products.addAll(newProducts);
+        notifyDataSetChanged(); // Notifica l'adapter del cambiamento
+    }
+
     // ViewHolder: definisce gli elementi visivi di ogni item
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView nameTextView, priceTextView;

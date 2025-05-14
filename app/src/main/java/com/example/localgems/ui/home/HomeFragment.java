@@ -9,6 +9,8 @@ import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.PopupWindow;
 import android.widget.Toast;
+import android.content.SharedPreferences;
+import android.preference.PreferenceManager;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
@@ -31,14 +33,17 @@ import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 
 public class HomeFragment extends Fragment {
 
-    private List<Product> products = new ArrayList<>() ;
+    private List<Product> products = new ArrayList<>();
     private ProductsAdapter productsAdapter;
     private FragmentHomeBinding binding;
     private PopupWindow popupWindow;
+    private SharedPreferences sharedPreferences;
+    private List<String> recentSearches;
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -57,11 +62,9 @@ public class HomeFragment extends Fragment {
 
         SearchView searchView = binding.toolbar.findViewById(R.id.search_view);
 
-        // Recent searches
-        List<String> recentSearches = new ArrayList<>();
-        recentSearches.add("Manzanas");
-        recentSearches.add("Bananas");
-        recentSearches.add("Piñas");
+        // SharedPreferences setup
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(requireContext());
+        recentSearches = loadRecentSearches();
 
         // Search suggestions popup
         View suggestionsPopup = inflater.inflate(R.layout.suggestion_list, null);
@@ -74,7 +77,6 @@ public class HomeFragment extends Fragment {
                 recentSearches
         );
         suggestionList.setAdapter(suggestionAdapter);
-
 
         searchView.post(() -> {
             int searchViewWidth = searchView.getWidth();
@@ -93,19 +95,30 @@ public class HomeFragment extends Fragment {
                 }
             });
 
+            // Aggiunto listener per il tasto "clear" della SearchView
+            searchView.setOnCloseListener(() -> {
+                getProducts(); // Reset filtro richiamando i prodotti iniziali
+                return false;
+            });
+
             searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
                 @Override
                 public boolean onQueryTextSubmit(String query) {
                     popupWindow.dismiss();
-                    Bundle bundle = new Bundle();
-                    bundle.putString("search_query", query);
-                    // TODO: Vedere come creare una nuovo fragment "Search" e aprirlo al posto di fragment home.
-                    //Navigation.findNavController(this).navigate(R.id.nav_search, bundle);
-                    return false;
+                    if (query != null && !query.trim().isEmpty()) {
+                        saveRecentSearch(query);
+                        suggestionAdapter.notifyDataSetChanged();
+                    }
+                    filterProductsFromFirebase(query); // Filtra i prodotti tramite Firebase
+                    return true;
                 }
 
                 @Override
                 public boolean onQueryTextChange(String newText) {
+                    if (newText == null || newText.trim().isEmpty()) {
+                        getProducts(); // Reset filtraggio
+                        return true;
+                    }
                     if (!popupWindow.isShowing()) {
                         popupWindow.showAsDropDown(searchView);
                     }
@@ -113,39 +126,6 @@ public class HomeFragment extends Fragment {
                 }
             });
         });
-
-/*
-        // Configure the suggestionsPopup
-        PopupWindow popupWindow = new PopupWindow(suggestionsPopup,
-                ViewGroup.LayoutParams.MATCH_PARENT,
-                ViewGroup.LayoutParams.WRAP_CONTENT,
-                false);
-        popupWindow.setOutsideTouchable(true);
-
-        // Show the popup window when the search view is clicked
-        searchView.setOnQueryTextFocusChangeListener((v, hasFocus) -> {
-            if (hasFocus && !popupWindow.isShowing()) {
-                popupWindow.showAsDropDown(searchView);
-            }
-        });
-
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String query) {
-                // Handle search submission
-                popupWindow.dismiss();
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                // Show the popup when text changes
-                if (!popupWindow.isShowing()) {
-                    popupWindow.showAsDropDown(searchView);
-                }
-                return false;
-            }
-        }); */
 
         // Handle suggestion click
         suggestionList.setOnItemClickListener((parent, view, position, id) -> {
@@ -174,9 +154,7 @@ public class HomeFragment extends Fragment {
         binding = null;
     }
 
-    // Metodo fittizio per ottenere i prodotti
     private List<Product> getProducts() {
-
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
         db.collection("products")
@@ -187,17 +165,18 @@ public class HomeFragment extends Fragment {
                     for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
                         Product product = doc.toObject(Product.class);
                         product.setId(doc.getId()); // Memorizza l'id del documento
+
+                        // Aggiorna le searchKeywords in minuscolo se necessario
+                        updateSearchKeywords(doc);
+
                         ratedProducts.add(product);
                     }
 
-                    // Ad esempio: aggiorna l'adapter con la nuova lista
-
-                    if (products != null)
-                    {
+                    if (products != null) {
                         products.clear();
                     }
                     products.addAll(ratedProducts);
-                    if( productsAdapter != null) {
+                    if (productsAdapter != null) {
                         productsAdapter.notifyDataSetChanged();
                     }
                 })
@@ -206,5 +185,78 @@ public class HomeFragment extends Fragment {
                 });
 
         return products;
+    }
+
+    // Nuova funzione per filtrare i prodotti tramite Firebase
+    private void filterProductsFromFirebase(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            getProducts();
+            return;
+        }
+        String lowerCaseQuery = query.toLowerCase();
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+        db.collection("products")
+            .get()
+            .addOnSuccessListener(queryDocumentSnapshots -> {
+                List<Product> filteredProducts = new ArrayList<>();
+                for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                    Product product = doc.toObject(Product.class);
+                    product.setId(doc.getId());
+                    if (product.getName().toLowerCase().contains(lowerCaseQuery)) {
+                        filteredProducts.add(product);
+                        continue;
+                    }
+                    List<String> keywords = (List<String>) doc.get("searchKeywords");
+                    if (keywords != null) {
+                        for (String keyword : keywords) {
+                            if (keyword.toLowerCase().contains(lowerCaseQuery)) {
+                                filteredProducts.add(product);
+                                break;
+                            }
+                        }
+                    }
+                }
+                products.clear();
+                products.addAll(filteredProducts);
+                productsAdapter.notifyDataSetChanged();
+            })
+            .addOnFailureListener(e -> {
+                Toast.makeText(getContext(), "Errore nel filtraggio: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+            });
+    }
+
+    // Metodo per aggiornare le parole chiave in minuscolo
+    private void updateSearchKeywords(QueryDocumentSnapshot doc) {
+        List<String> keywords = (List<String>) doc.get("searchKeywords");
+        if (keywords != null) {
+            boolean needsUpdate = false;
+            List<String> lowerCaseKeywords = new ArrayList<>();
+            for (String kw : keywords) {
+                String lowerKw = kw.toLowerCase();
+                lowerCaseKeywords.add(lowerKw);
+                if (!kw.equals(lowerKw)) { // Se la keyword non è già in minuscolo
+                    needsUpdate = true;
+                }
+            }
+            if (needsUpdate) {
+                doc.getReference().update("searchKeywords", lowerCaseKeywords);
+            }
+        }
+    }
+
+    private void saveRecentSearch(String query) {
+        if (!recentSearches.contains(query)) {
+            recentSearches.add(0, query);
+            if (recentSearches.size() > 10) {
+                recentSearches.remove(recentSearches.size() - 1);
+            }
+            sharedPreferences.edit()
+                    .putStringSet("recent_searches_home", new HashSet<>(recentSearches))
+                    .apply();
+        }
+    }
+
+    private List<String> loadRecentSearches() {
+        return new ArrayList<>(sharedPreferences.getStringSet("recent_searches_home", new HashSet<>()));
     }
 }
