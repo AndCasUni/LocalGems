@@ -232,8 +232,6 @@ public class SignupFragment extends Fragment {
                         userData.put("lastName", lastName);
                         userData.put("birthDate", birthDate);
                         userData.put("email", email);
-                        userData.put("cart", new java.util.ArrayList<>()); // opzionale: inizializza carrello vuoto
-
                         com.google.firebase.firestore.FirebaseFirestore.getInstance()
                                 .collection("users")
                                 .document(userId)

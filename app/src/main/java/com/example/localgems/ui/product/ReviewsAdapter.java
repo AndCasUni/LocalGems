@@ -43,6 +43,8 @@ public class ReviewsAdapter extends RecyclerView.Adapter<ReviewsAdapter.ViewHold
 
         // Recupera autore dal campo "user" (user ID)
         String authorID = review.getUtente();
+        Log.e("USER_INFO", "UTENTE " + authorID);
+
         if (authorID != null && !authorID.isEmpty()) {
             FirebaseFirestore db = FirebaseFirestore.getInstance();
             db.collection("users").document(authorID)

@@ -67,15 +67,8 @@ public class OrdersFragment extends Fragment {
                             Log.e("FIREBASE", "trovati : " + latestIds.size());
 
                             fetchPurchases(latestIds);
-                        } else {
-                            // Usa ordini finti se non ci sono ordini reali
-                            useFakeOrders();
-                            noOrdersText.setVisibility(View.VISIBLE); // Mostra il messaggio se non ci sono ordini
+
                         }
-                    } else {
-                        // Usa ordini finti se il documento non esiste
-                        useFakeOrders();
-                        noOrdersText.setVisibility(View.VISIBLE); // Mostra il messaggio se il documento non esiste
                     }
                 });
 
@@ -106,20 +99,5 @@ public class OrdersFragment extends Fragment {
         }
     }
 
-    private void useFakeOrders() {
-        SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
 
-        try {
-            List<Purchase> fakePurchases = Arrays.asList(
-                    new Purchase("fake1", dateFormat.parse("2023-10-01"), 29.99),
-                    new Purchase("fake2", dateFormat.parse("2023-09-25"), 49.99),
-                    new Purchase("fake3", dateFormat.parse("2023-09-15"), 19.99)
-            );
-
-            adapter = new PurchaseAdapter(fakePurchases);
-            recyclerView.setAdapter(adapter);
-        } catch (ParseException e) {
-            Log.e("FIREBASE", "Errore nella creazione delle date fittizie", e);
-        }
-    }
 }
